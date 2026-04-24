@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { Logo } from '@/components/ui/logo';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -88,10 +89,7 @@ export default function SignUpPage() {
           <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] -ml-40 -mt-40"></div>
           
           <div className="relative z-10 flex items-center gap-3">
-            <div className="p-2 bg-indigo-600 rounded-xl">
-              <Building2 className="h-6 w-6 text-white" />
-            </div>
-            <span className="font-black text-2xl tracking-tighter">COPROSYNC</span>
+            <Logo />
           </div>
 
           <div className="relative z-10 space-y-6">

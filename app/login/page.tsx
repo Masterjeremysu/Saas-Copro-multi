@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
-import { Building2, Mail, Lock, Loader2, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, Loader2, ArrowRight, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { Logo } from '@/components/ui/logo';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -51,10 +52,7 @@ export default function LoginPage() {
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] -mr-40 -mt-40"></div>
           
           <div className="relative z-10 flex items-center gap-3">
-            <div className="p-2 bg-indigo-600 rounded-xl">
-              <Building2 className="h-6 w-6 text-white" />
-            </div>
-            <span className="font-black text-2xl tracking-tighter">COPROSYNC</span>
+            <Logo className="invert brightness-0" />
           </div>
 
           <div className="relative z-10 space-y-6">
