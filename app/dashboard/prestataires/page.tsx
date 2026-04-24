@@ -29,9 +29,21 @@ import {
 } from "@/components/ui/dialog";
 import { HasRole } from '@/components/auth-guard';
 import { toast } from 'sonner';
+import { useCallback } from 'react';
+
+interface Prestataire {
+  id: string;
+  nom: string;
+  specialite: string;
+  telephone?: string;
+  email?: string;
+  adresse?: string;
+  note?: number;
+  copropriete_id: string;
+}
 
 export default function PrestatairesPage() {
-  const [prestataires, setPrestataires] = useState<any[]>([]);
+  const [prestataires, setPrestataires] = useState<Prestataire[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
@@ -40,18 +52,18 @@ export default function PrestatairesPage() {
   
   const supabase = createClient();
 
-  const loadPrestataires = async () => {
+  const loadPrestataires = useCallback(async () => {
     setIsLoading(true);
     const { data } = await supabase
       .from('prestataires')
       .select('*')
       .order('nom', { ascending: true });
     
-    if (data) setPrestataires(data);
+    if (data) setPrestataires(data as Prestataire[]);
     setIsLoading(false);
-  };
+  }, [supabase]);
 
-  useEffect(() => { loadPrestataires(); }, []);
+  useEffect(() => { loadPrestataires(); }, [loadPrestataires]);
 
   const handleAddPrestataire = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -83,8 +95,9 @@ export default function PrestatairesPage() {
       setIsDialogOpen(false);
       loadPrestataires();
 
-    } catch (err: any) {
-      toast.error("Erreur : " + err.message);
+    } catch (err: unknown) {
+      const error = err as Error;
+      toast.error("Erreur : " + error.message);
     } finally {
       setIsSaving(false);
     }
@@ -117,8 +130,8 @@ export default function PrestatairesPage() {
             <DialogContent className="rounded-[2.5rem] border-none shadow-2xl p-8 sm:max-w-[500px]">
               <DialogHeader className="mb-6">
                 <DialogTitle className="text-2xl font-black tracking-tight text-slate-900">Nouveau Prestataire</DialogTitle>
-                <DialogDescription className="text-slate-500"> {/* LE FIX EST ICI */}
-                  Ajoutez les coordonnées d'un artisan pour l'intégrer à l'annuaire de la copropriété.
+                <DialogDescription className="text-slate-500">
+                  Ajoutez les coordonnées d&apos;un artisan pour l&apos;intégrer à l&apos;annuaire de la copropriété.
                 </DialogDescription>
               </DialogHeader>
               
@@ -129,15 +142,18 @@ export default function PrestatairesPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Spécialité</Label>
+                  <Label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Spécialité Métier (Sous-nom)</Label>
                   <select name="specialite" required className="flex h-12 w-full rounded-xl bg-slate-50 px-3 py-2 text-sm border-none font-bold focus:ring-4 focus:ring-indigo-50 outline-none">
                     <option value="Plomberie">Plomberie</option>
                     <option value="Électricité">Électricité</option>
-                    <option value="Chauffage / Clim">Chauffage / Clim</option>
+                    <option value="Chauffage">Chauffage</option>
+                    <option value="Toiture">Toiture</option>
+                    <option value="Serrurerie">Serrurerie</option>
                     <option value="Ascenseur">Ascenseur</option>
-                    <option value="Nettoyage">Nettoyage / Entretien</option>
-                    <option value="Sécurité">Sécurité / Alarmes</option>
-                    <option value="Général">Travaux Généraux</option>
+                    <option value="Espaces Verts">Espaces Verts</option>
+                    <option value="Parties Communes">Parties Communes</option>
+                    <option value="Gros Œuvre">Gros Œuvre</option>
+                    <option value="Autre">Autre</option>
                   </select>
                 </div>
 
@@ -181,7 +197,7 @@ export default function PrestatairesPage() {
       ) : filtered.length === 0 ? (
         <div className="py-20 text-center bg-white rounded-[3rem] border-2 border-dashed border-slate-100">
           <Wrench className="h-12 w-12 text-slate-200 mx-auto mb-4" />
-          <p className="text-slate-400 font-bold italic">Aucun prestataire dans l'annuaire.</p>
+          <p className="text-slate-400 font-bold italic">Aucun prestataire dans l&apos;annuaire.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

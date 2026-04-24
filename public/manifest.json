@@ -1,0 +1,20 @@
+{
+  "name": "CoproSync — Gestion de Copropriété",
+  "short_name": "CoproSync",
+  "description": "Plateforme de gestion de copropriété connectée. Signalements, votes, contrats et communication en temps réel.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#4F46E5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "fr"
+}

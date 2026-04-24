@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { 
-  Building2, Users, Key, Activity, 
-  ChevronLeft, Plus, Copy, Check, ShieldCheck 
+  Building2, Users, Key, 
+  ChevronLeft, Copy, Check 
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,17 +15,37 @@ import { HasRole } from '@/components/auth-guard';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
+interface Copropriete {
+  id: string;
+  nom: string;
+}
+
+interface UserProfile {
+  id: string;
+  prenom: string;
+  nom: string;
+  email: string;
+  appartement?: string;
+  role: string;
+}
+
+interface InvitationCode {
+  id: string;
+  code: string;
+  role_attribue: string;
+}
+
 export default function CoproManagementPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const [copro, setCopro] = useState<any>(null);
-  const [users, setUsers] = useState<any[]>([]);
-  const [codes, setCodes] = useState<any[]>([]);
+  const [copro, setCopro] = useState<Copropriete | null>(null);
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [codes, setCodes] = useState<InvitationCode[]>([]);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const supabase = createClient();
 
   // CHARGEMENT DES DONNÉES DE L'INSTANCE
-  async function loadData() {
+  const loadData = useCallback(async () => {
     // 1. Infos de la copro
     const { data: coproData } = await supabase.from('coproprietes').select('*').eq('id', id).single();
     if (coproData) setCopro(coproData);
@@ -37,16 +57,21 @@ export default function CoproManagementPage({ params }: { params: Promise<{ id: 
     // 3. Codes d'invitation actifs
     const { data: codesData } = await supabase.from('invitation_codes').select('*').eq('copropriete_id', id).order('created_at', { ascending: false });
     if (codesData) setCodes(codesData);
-  }
+  }, [id, supabase]);
 
-  useEffect(() => { loadData(); }, [id]);
+  useEffect(() => {
+    const init = async () => {
+      await loadData();
+    };
+    init();
+  }, [loadData]);
 
   // GÉNÉRATEUR DE CODE MAGIQUE
   async function generateCode(role: string) {
     setIsGenerating(true);
     // Génère un code style : SYNC-A1B2-C3D4
     const randomString = Math.random().toString(36).substring(2, 10).toUpperCase();
-    const prefix = role === 'syndic' ? 'ADMIN' : role === 'membre_cs' ? 'CS' : 'RES';
+    const prefix = role === 'syndic' ? 'ADMIN' : role === 'membre_cs' ? 'CS' : role === 'artisan' ? 'PRO' : 'RES';
     const newCode = `${prefix}-${randomString.slice(0,4)}-${randomString.slice(4,8)}`;
 
     const { error } = await supabase.from('invitation_codes').insert({
@@ -104,7 +129,7 @@ export default function CoproManagementPage({ params }: { params: Promise<{ id: 
         <Tabs defaultValue="codes" className="space-y-8">
           <TabsList className="bg-slate-100 p-1 rounded-2xl h-14 w-full md:w-auto flex">
             <TabsTrigger value="codes" className="rounded-xl font-bold flex-1 md:flex-none text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <Key className="h-4 w-4 mr-2" /> Codes d'accès
+              <Key className="h-4 w-4 mr-2" /> Codes d&apos;accès
             </TabsTrigger>
             <TabsTrigger value="users" className="rounded-xl font-bold flex-1 md:flex-none text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">
               <Users className="h-4 w-4 mr-2" /> Utilisateurs ({users.length})
@@ -130,6 +155,7 @@ export default function CoproManagementPage({ params }: { params: Promise<{ id: 
                       <SelectItem value="syndic">Pour le Syndic 👑</SelectItem>
                       <SelectItem value="membre_cs">Pour le Conseil Syndical</SelectItem>
                       <SelectItem value="copropriétaire">Pour un Résident</SelectItem>
+                      <SelectItem value="artisan">Pour une Entreprise Prestataire 🛠️</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -146,7 +172,8 @@ export default function CoproManagementPage({ params }: { params: Promise<{ id: 
                           <Badge variant="outline" className={`${
                             code.role_attribue === 'syndic' ? 'border-rose-200 text-rose-600 bg-rose-50' : 
                             code.role_attribue === 'membre_cs' ? 'border-amber-200 text-amber-600 bg-amber-50' : 
-                            'border-indigo-200 text-indigo-600 bg-indigo-50'
+                            code.role_attribue === 'artisan' ? 'border-indigo-200 text-indigo-600 bg-indigo-50' :
+                            'border-emerald-200 text-emerald-600 bg-emerald-50'
                           } uppercase text-[10px] font-black tracking-widest px-3 py-1`}>
                             {code.role_attribue}
                           </Badge>
@@ -174,11 +201,11 @@ export default function CoproManagementPage({ params }: { params: Promise<{ id: 
           <TabsContent value="users">
              <Card className="rounded-[2.5rem] border-slate-100 shadow-sm">
                 <CardHeader className="p-8 pb-4">
-                  <CardTitle className="text-2xl font-black">Comptes liés à l'instance</CardTitle>
+                  <CardTitle className="text-2xl font-black">Comptes liés à l&apos;instance</CardTitle>
                 </CardHeader>
                 <CardContent className="p-8 pt-0">
                   {users.length === 0 ? (
-                    <p className="text-slate-400 italic">Personne n'a encore rejoint cette résidence.</p>
+                    <p className="text-slate-400 italic">Personne n&apos;a encore rejoint cette résidence.</p>
                   ) : (
                     <div className="grid gap-4">
                       {users.map(u => (

@@ -34,8 +34,9 @@ export default function LoginPage() {
       toast.success("Content de vous revoir !");
       router.push('/dashboard');
       router.refresh();
-    } catch (err: any) {
-      toast.error("Erreur de connexion : " + err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Identifiants invalides";
+      toast.error("Erreur de connexion : " + message);
     } finally {
       setIsLoading(false);
     }

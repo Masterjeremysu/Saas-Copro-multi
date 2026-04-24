@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
-// L'IMPORT CORRIGÉ EST ICI : J'ai ajouté ShieldAlert dans la liste
 import { Building2, Key, Mail, Lock, User, Loader2, ArrowRight, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,7 +28,7 @@ export default function SignUpPage() {
 
     try {
       // 1. VÉRIFICATION DU CODE D'INVITATION
-      const { data: codeData, error: codeError } = await supabase
+      const { data: codeData } = await supabase
         .from('invitation_codes')
         .select('*')
         .eq('code', codeInvitation)
@@ -72,8 +71,9 @@ export default function SignUpPage() {
         router.push('/dashboard');
       }
 
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Une erreur est survenue";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +99,7 @@ export default function SignUpPage() {
               Rejoignez votre <br/><span className="text-indigo-400">résidence.</span>
             </h1>
             <p className="text-slate-400 font-medium text-lg max-w-sm">
-              Saisissez la clé d'activation fournie par votre syndic pour accéder à votre espace de gestion dédié.
+              Saisissez la clé d&apos;activation fournie par votre syndic pour accéder à votre espace de gestion dédié.
             </p>
           </div>
 
@@ -116,13 +116,13 @@ export default function SignUpPage() {
             
             <div className="space-y-2">
               <h2 className="text-3xl font-black text-slate-900 tracking-tighter">Créer un compte</h2>
-              <p className="text-slate-500 font-medium">Configurez votre profil d'accès.</p>
+              <p className="text-slate-500 font-medium">Configurez votre profil d&apos;accès.</p>
             </div>
 
             <form onSubmit={handleSignUp} className="space-y-6">
               
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-indigo-600 tracking-widest ml-1">Clé d'invitation CoproSync</Label>
+                <Label className="text-[10px] font-black uppercase text-indigo-600 tracking-widest ml-1">Clé d&apos;invitation CoproSync</Label>
                 <div className="relative">
                   <Key className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-indigo-400" />
                   <Input 

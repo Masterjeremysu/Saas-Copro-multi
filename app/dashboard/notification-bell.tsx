@@ -2,12 +2,23 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import { RealtimeChannel } from '@supabase/supabase-js';
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
+interface Notification {
+  id: string;
+  titre: string;
+  message: string;
+  lu: boolean;
+  lien: string | null;
+  created_at: string;
+  user_id: string;
+}
+
 export function NotificationBell() {
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
@@ -24,12 +35,12 @@ export function NotificationBell() {
       .order('created_at', { ascending: false })
       .limit(10);
     
-    if (data) setNotifications(data);
+    if (data) setNotifications(data as Notification[]);
   };
 
   useEffect(() => {
     loadNotifications();
-    let channel: any;
+    let channel: RealtimeChannel;
 
     // FIX : Création d'une fonction asynchrone propre pour gérer le temps réel
     const setupRealtime = async () => {
@@ -70,15 +81,18 @@ export function NotificationBell() {
         supabase.removeChannel(channel);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const unreadCount = notifications.filter(n => !n.lu).length;
 
-  const markAsRead = async (id: string, lien: string) => {
+  const markAsRead = async (id: string, lien: string | null) => {
     await supabase.from('notifications').update({ lu: true }).eq('id', id);
     setIsOpen(false);
     loadNotifications();
-    router.push(lien);
+    if (lien) {
+      router.push(lien);
+    }
   };
 
   const markAllAsRead = async () => {

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
 // On définit les rôles pour éviter les fautes de frappe
-type Role = 'copropriétaire' | 'membre_cs' | 'syndic' | 'administrateur';
+type Role = 'copropriétaire' | 'membre_cs' | 'syndic' | 'administrateur' | 'artisan';
 
 interface HasRoleProps {
   roles: Role[];
@@ -30,7 +30,7 @@ export function HasRole({ roles, children }: HasRoleProps) {
       setLoading(false);
     }
     getRole();
-  }, []);
+  }, [supabase]);
 
   // Pendant le chargement, on n'affiche rien pour éviter les flashs d'UI
   if (loading) return null;

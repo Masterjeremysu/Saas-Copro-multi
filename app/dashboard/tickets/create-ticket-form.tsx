@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import { notifyCopropriete } from '@/utils/notification-service';
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { 
@@ -64,13 +65,23 @@ export function CreateTicketForm({ onTicketCreated }: { onTicketCreated: () => v
 
       if (error) throw error;
 
+      // Notification automatique à toute la copro
+      await notifyCopropriete({
+        coproprieteId: profile?.copropriete_id,
+        titre: `🔧 Nouveau Signalement`,
+        message: `"${formData.get('titre')}" a été signalé (${formData.get('urgence')}).`,
+        lien: '/dashboard/tickets',
+        type: 'ticket'
+      });
+
       toast.success("Signalement envoyé !");
       setOpen(false);
       setFile(null);
-      onTicketCreated(); // Correction du nom de la fonction ici
-    } catch (err: any) {
+      onTicketCreated();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Une erreur est survenue";
       console.error("Erreur détaillée :", err);
-      toast.error("Erreur : " + err.message);
+      toast.error("Erreur : " + message);
     } finally {
       setIsLoading(false);
     }

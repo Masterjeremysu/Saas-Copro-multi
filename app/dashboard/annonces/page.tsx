@@ -1,152 +1,144 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { 
-  Megaphone, 
-  Clock, 
-  Loader2,
-  AlertTriangle,
-  Send
+  Megaphone, ArrowLeft, Loader2, 
+  Calendar, User, CheckCircle2
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import Link from 'next/link';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+
+interface Annonce {
+  id: string;
+  titre: string;
+  contenu: string;
+  type: string;
+  prioritaire: boolean;
+  image_url?: string;
+  created_at: string;
+  profiles: { prenom: string; nom: string; role: string } | null;
+}
 
 export default function AnnoncesPage() {
-  const [annonces, setAnnonces] = useState<any[]>([]);
+  const [annonces, setAnnonces] = useState<Annonce[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isPosting, setIsPosting] = useState(false);
   const supabase = createClient();
 
-  const [newTitle, setNewTitle] = useState('');
-  const [newContent, setNewContent] = useState('');
-
-  const fetchAnnonces = async () => {
+  const loadAnnonces = useCallback(async () => {
     setIsLoading(true);
-    const { data } = await supabase
-      .from('annonces')
-      .select('*, auteur:profiles(prenom, nom, role)')
-      .order('prioritaire', { ascending: false })
-      .order('created_at', { ascending: false });
-    
-    if (data) setAnnonces(data);
-    setIsLoading(false);
-  };
-
-  useEffect(() => { fetchAnnonces(); }, []);
-
-  const handlePost = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTitle || !newContent) return;
-
-    setIsPosting(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      const { data: profile } = await supabase.from('profiles').select('copropriete_id').eq('id', user?.id).single();
+      if (!user) return;
+      
+      const { data: profile } = await supabase.from('profiles').select('copropriete_id').eq('id', user.id).single();
 
-      const { error } = await supabase.from('annonces').insert({
-        titre: newTitle,
-        contenu: newContent,
-        auteur_id: user?.id,
-        copropriete_id: profile?.copropriete_id,
-        prioritaire: false
-      });
+      const { data, error } = await supabase
+        .from('annonces')
+        .select('*, profiles:auteur_id (prenom, nom, role)')
+        .eq('copropriete_id', profile?.copropriete_id)
+        .eq('type', 'alerte')
+        .order('created_at', { ascending: false });
 
-      if (error) throw error;
-
-      toast.success("Annonce publiée sur le mur !");
-      setNewTitle('');
-      setNewContent('');
-      fetchAnnonces();
-    } catch (err: any) {
-      toast.error("Erreur : " + err.message);
+      if (!error && data) setAnnonces(data as unknown as Annonce[]);
     } finally {
-      setIsPosting(false);
+      setIsLoading(false);
     }
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    loadAnnonces();
+  }, [loadAnnonces]);
 
   return (
-    <div className="p-6 lg:p-10 space-y-8 max-w-4xl mx-auto mb-20">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] lg:p-10 animate-in fade-in duration-500 pb-32 lg:pb-20">
       
-      <div>
-        <h1 className="text-4xl font-black tracking-tighter text-slate-900 flex items-center gap-3 italic">
-          <Megaphone className="h-10 w-10 text-indigo-600" /> Le Mur
-        </h1>
-        <p className="text-slate-500 font-medium">L'actualité de votre résidence en temps réel.</p>
-      </div>
-
-      <Card className="rounded-[2.5rem] border-none shadow-xl shadow-indigo-100/50 overflow-hidden">
-        <CardContent className="p-8 space-y-4">
-          <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest ml-1">Nouvelle publication</p>
-          <form onSubmit={handlePost} className="space-y-4">
-            <Input 
-              placeholder="Titre de l'annonce..." 
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              className="h-12 rounded-xl bg-slate-50 border-none font-bold focus:ring-4 focus:ring-indigo-50"
-            />
-            <Textarea 
-              placeholder="Que voulez-vous dire à vos voisins ?" 
-              value={newContent}
-              onChange={(e) => setNewContent(e.target.value)}
-              className="min-h-[100px] rounded-xl bg-slate-50 border-none font-medium focus:ring-4 focus:ring-indigo-50"
-            />
-            <div className="flex justify-end">
-              <Button disabled={isPosting} className="bg-indigo-600 hover:bg-indigo-700 rounded-xl px-8 h-12 font-black shadow-lg">
-                {isPosting ? <Loader2 className="animate-spin h-5 w-5" /> : <><Send className="mr-2 h-4 w-4" /> Publier</>}
-              </Button>
+      {/* HEADER MOBILE COMPACT */}
+      <div className="max-w-5xl mx-auto mb-6 lg:mb-10">
+         <div className="flex items-center gap-4 lg:gap-6 px-4 lg:px-0 pt-4 lg:pt-0">
+            <Link href="/dashboard" className="h-10 w-10 lg:h-14 lg:w-14 rounded-xl lg:rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 flex items-center justify-center text-slate-400 hover:text-indigo-600 shadow-sm transition-all">
+               <ArrowLeft className="h-4 w-4 lg:h-6 lg:w-6" />
+            </Link>
+            <div>
+               <h1 className="text-xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white flex items-center gap-2 lg:gap-4 italic leading-none">
+                  <Megaphone className="h-6 w-6 lg:h-10 lg:w-10 text-indigo-600" /> Le Mur Officiel
+               </h1>
+               <p className="text-slate-500 font-bold text-xs uppercase tracking-[0.2em] lg:tracking-[0.3em] mt-1">Communications du Syndic</p>
             </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      <div className="space-y-6 pt-4">
-        {isLoading ? (
-          <div className="py-20 text-center"><Loader2 className="animate-spin mx-auto text-indigo-600" /></div>
-        ) : annonces.length === 0 ? (
-          <div className="py-20 text-center bg-white rounded-[3rem] border-2 border-dashed border-slate-100">
-            <p className="text-slate-400 font-bold italic">Le mur est vide. Soyez le premier à poster !</p>
-          </div>
-        ) : (
-          annonces.map((post) => (
-            <Card key={post.id} className={`rounded-[2.5rem] border-none shadow-sm overflow-hidden transition-all hover:shadow-md ${
-              post.prioritaire ? 'ring-2 ring-rose-500 ring-offset-4' : ''
-            }`}>
-              <CardContent className="p-0">
-                <div className={`px-8 py-3 flex justify-between items-center ${
-                  post.prioritaire ? 'bg-rose-500 text-white' : 'bg-slate-50 text-slate-400'
-                }`}>
-                  <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
-                    <Clock className="h-3 w-3" /> {new Date(post.created_at).toLocaleDateString()}
-                  </div>
-                </div>
-
-                <div className="p-8 space-y-4 bg-white">
-                  <div className="space-y-1">
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase italic">
-                      {post.titre}
-                    </h2>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-indigo-600">{post.auteur?.prenom} {post.auteur?.nom}</span>
-                      <Badge variant="outline" className="text-[9px] font-black uppercase opacity-40 px-2">
-                        {post.auteur?.role}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <p className="text-slate-600 font-medium leading-relaxed whitespace-pre-wrap">
-                    {post.contenu}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
+         </div>
       </div>
+
+      <div className="max-w-5xl mx-auto space-y-4 lg:space-y-6 px-4 lg:px-0">
+         {isLoading ? (
+            <div className="flex justify-center py-20"><Loader2 className="h-10 w-10 animate-spin text-indigo-600" /></div>
+         ) : annonces.length === 0 ? (
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] lg:rounded-[3rem] p-12 lg:p-20 text-center border border-dashed border-slate-200 dark:border-white/10 shadow-sm">
+               <CheckCircle2 className="h-12 w-12 lg:h-16 lg:w-16 text-emerald-500 mx-auto mb-4 opacity-20" />
+               <p className="text-slate-400 font-black uppercase tracking-widest text-xs italic">Aucune communication pour le moment</p>
+            </div>
+         ) : (
+            annonces.map((post, idx) => (
+               <motion.div 
+                 key={post.id}
+                 initial={{ opacity: 0, x: -20 }}
+                 whileInView={{ opacity: 1, x: 0 }}
+                 viewport={{ once: true }}
+                 transition={{ delay: idx * 0.1 }}
+                 className={`relative overflow-hidden bg-white dark:bg-slate-900 rounded-[1.5rem] lg:rounded-[2.5rem] border ${post.prioritaire ? 'border-rose-200 dark:border-rose-900/30' : 'border-slate-100 dark:border-white/5'} shadow-sm group hover:shadow-xl transition-all duration-500`}
+               >
+                  {post.prioritaire && <div className="absolute top-0 left-0 w-1.5 lg:w-2 h-full bg-rose-500" />}
+                  
+                  <div className="p-6 lg:p-10 flex flex-col lg:flex-row gap-6 lg:gap-8">
+                     <div className="flex-1 space-y-4 lg:space-y-6">
+                        <div className="flex items-center gap-2 lg:gap-3">
+                           <Badge className={`text-xs ${post.prioritaire ? 'bg-rose-500' : 'bg-indigo-500'} text-white`}>
+                              {post.prioritaire ? 'URGENT' : 'INFO'}
+                           </Badge>
+                           <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                              {format(new Date(post.created_at), 'dd MMM yyyy', { locale: fr })}
+                           </span>
+                        </div>
+                        
+                        <div className="space-y-2 lg:space-y-4">
+                           <h2 className="text-lg lg:text-3xl font-black tracking-tighter text-slate-900 dark:text-white leading-tight">
+                              {post.titre}
+                           </h2>
+                           <p className="text-slate-600 dark:text-slate-400 font-medium text-sm lg:text-lg leading-relaxed">
+                              {post.contenu}
+                           </p>
+                        </div>
+
+                        {post.image_url && (
+                           <div className="relative h-48 lg:h-80 w-full rounded-xl lg:rounded-2xl overflow-hidden mt-4">
+                              <Image src={post.image_url} alt={post.titre} fill className="object-cover" />
+                           </div>
+                        )}
+
+                        <div className="flex flex-wrap gap-4 lg:gap-6 pt-4 border-t border-slate-50 dark:border-white/5">
+                           <div className="flex items-center gap-1.5 lg:gap-2 text-slate-400 text-xs font-black uppercase tracking-widest">
+                              <User className="h-3.5 w-3.5 lg:h-4 lg:w-4" /> {post.profiles?.prenom} {post.profiles?.nom}
+                           </div>
+                           <div className="flex items-center gap-1.5 lg:gap-2 text-slate-400 text-xs font-black uppercase tracking-widest">
+                              <Calendar className="h-3.5 w-3.5 lg:h-4 lg:w-4" /> {format(new Date(post.created_at), 'HH:mm', { locale: fr })}
+                           </div>
+                        </div>
+                     </div>
+                     
+                     <div className="hidden lg:flex lg:w-48 items-center justify-center">
+                        <div className="h-32 w-32 rounded-[2rem] bg-slate-50 dark:bg-white/5 flex items-center justify-center group-hover:rotate-6 transition-transform duration-500">
+                           <Megaphone className={`h-12 w-12 ${post.prioritaire ? 'text-rose-500' : 'text-indigo-600'}`} />
+                        </div>
+                     </div>
+                  </div>
+               </motion.div>
+            ))
+         )}
+      </div>
+
     </div>
   );
 }
