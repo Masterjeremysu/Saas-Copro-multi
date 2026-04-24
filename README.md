@@ -1,4 +1,4 @@
-# 🏛️ CoproSync V3 | Enterprise Management Suite
+# 🏛️ CoproSync V3 | Suite de Gestion de Prestige
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
@@ -6,82 +6,82 @@
 ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-> **The Ultimate High-Security SaaS Ecosystem for Modern Co-ownership Management.**
+> **L'écosystème SaaS ultra-sécurisé dédié à la gestion moderne des copropriétés.**
 
-CoproSync V3 is a premium, enterprise-grade platform designed to streamline governance, document management, and communication within modern co-ownerships (copropriétés). It combines a high-prestige aesthetic with robust backend architecture to deliver a "Cyber-Security First" experience.
-
----
-
-## ✨ Core Pillars of Excellence
-
-### 🔐 Document Vault (Cyber-Safe)
-An immutable digital archive for all co-ownership files. Features a premium "Glassmorphism" UI, real-time storage metrics, and categorized security levels (Legal, Technical, Finance).
-
-### 🏛️ Governance Engine (AG Module)
-Full lifecycle management of General Assemblies. From automatic scheduling in the unified agenda to real-time voting tracking and legal PV generation.
-
-### 📅 Unified Governance Agenda
-A synchronized timeline that bridges governance milestones with daily operations. Supports **Universal ICS Export** for Google, Apple, and Outlook calendars.
-
-### 🧠 Community Wiki & Knowledge Base
-A centralized intelligence hub for building regulations, maintenance history, and collective knowledge.
-
-### 🚀 Dashboard Cockpit
-A high-performance command center providing real-time KPIs, artisan "Smart Matching" for interventions, and a premium support modal system.
+CoproSync V3 est une plateforme premium de classe entreprise, conçue pour fluidifier la gouvernance, la gestion documentaire et la communication au sein des copropriétés modernes. Elle allie une esthétique de prestige à une architecture robuste pour offrir une expérience "Cyber-Sécurité" de premier ordre.
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## ✨ Les Piliers d'Excellence
 
-- **Frontend**: [Next.js 15](https://nextjs.org/) (App Router) for high-performance server-side rendering.
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with a custom design system based on **Shadcn/UI**.
-- **Animations**: [Framer Motion](https://www.framer.com/motion/) for fluid, prestigious micro-interactions.
-- **Backend**: [Supabase](https://supabase.com/) (PostgreSQL + Auth + Real-time) for a robust and scalable data layer.
-- **State Management**: React Hooks + Context API for seamless data flow.
+### 🔐 Coffre-fort Numérique (Document Vault)
+Une archive numérique immuable pour tous les fichiers de la copropriété. Interface "Glassmorphism" premium, métriques de stockage en temps réel et niveaux de sécurité catégorisés (Légal, Technique, Finance).
+
+### 🏛️ Moteur de Gouvernance (Module AG)
+Gestion complète du cycle de vie des Assemblées Générales. De la planification automatique dans l'agenda unifié au suivi des votes en temps réel et à la génération de PV légaux.
+
+### 📅 Agenda de Gouvernance Unifié
+Une timeline synchronisée qui fait le pont entre les jalons de gouvernance et les opérations quotidiennes. Supporte l'**Export ICS Universel** pour les agendas Google, Apple et Outlook.
+
+### 🧠 Wiki Communautaire & Base de Connaissances
+Un hub d'intelligence centralisé pour le règlement de copropriété, l'historique de maintenance et le savoir collectif.
+
+### 🚀 Cockpit de Bord (Dashboard)
+Un centre de commande haute performance offrant des KPIs en temps réel, un "Smart Matching" des artisans pour les interventions et un système de support premium.
 
 ---
 
-## 🚀 Getting Started
+## 🛠️ Stack Technique & Architecture
 
-### 1. Clone the repository
+- **Frontend** : [Next.js 15](https://nextjs.org/) (App Router) pour des performances et un rendu serveur optimisés.
+- **Styling** : [Tailwind CSS](https://tailwindcss.com/) avec un design system sur mesure basé sur **Shadcn/UI**.
+- **Animations** : [Framer Motion](https://www.framer.com/motion/) pour des micro-interactions fluides et prestigieuses.
+- **Backend** : [Supabase](https://supabase.com/) (PostgreSQL + Auth + Real-time) pour une couche de données robuste et scalable.
+- **Gestion d'État** : React Hooks + Context API pour un flux de données fluide.
+
+---
+
+## 🚀 Démarrage Rapide
+
+### 1. Cloner le dépôt
 ```bash
 git clone https://github.com/Masterjeremysu/Saas-Copro-multi.git
 cd coprosync-v3
 ```
 
-### 2. Install dependencies
+### 2. Installer les dépendances
 ```bash
 npm install
 ```
 
-### 3. Environment Setup
-Create a `.env.local` file in the root directory and add your Supabase credentials:
+### 3. Configuration de l'environnement
+Créez un fichier `.env.local` à la racine et ajoutez vos identifiants Supabase :
 ```env
-NEXT_PUBLIC_SUPABASE_URL=your_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+NEXT_PUBLIC_SUPABASE_URL=votre_url_projet
+NEXT_PUBLIC_SUPABASE_ANON_KEY=votre_cle_anon
 ```
 
-### 4. Launch the Engine
+### 4. Lancer le moteur
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) to witness the evolution.
+Ouvrez [http://localhost:3000](http://localhost:3000) pour témoigner de l'évolution.
 
 ---
 
-## 💎 Design Philosophy
-CoproSync V3 is built on the principle of **"Prestige SaaS"**. 
-- **Mobile-First**: Every pixel is optimized for high-end mobile experiences.
-- **Visual Excellence**: Deep indigo palettes, sleek dark modes, and curated typography.
-- **User Empowerment**: Complex administrative tasks simplified through intuitive, interactive UI cards.
+## 💎 Philosophie Design
+CoproSync V3 repose sur le principe du **"SaaS de Prestige"**. 
+- **Mobile-First** : Chaque pixel est optimisé pour les expériences mobiles haut de gamme.
+- **Excellence Visuelle** : Palettes indigo profondes, modes sombres élégants et typographie soignée.
+- **Empowerment** : Des tâches administratives complexes simplifiées par une interface intuitive et interactive.
 
 ---
 
-## 📄 License
-Project managed by **Masterjeremysu**. Internal Enterprise Suite.
+## 📄 Licence
+Projet géré par **Masterjeremysu**. Suite d'Entreprise Interne.
 
 ---
 
 <p align="center">
-  <b>Built with Passion for Modern Governance 🏢✨</b>
+  <b>Développé avec passion pour la gouvernance moderne 🏢✨</b>
 </p>
