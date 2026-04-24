@@ -15,18 +15,23 @@ CoproSync V3 est une plateforme premium de classe entreprise, conçue pour fluid
 ## ✨ Les Piliers d'Excellence
 
 ### 🔐 Coffre-fort Numérique (Document Vault)
+
 Une archive numérique immuable pour tous les fichiers de la copropriété. Interface "Glassmorphism" premium, métriques de stockage en temps réel et niveaux de sécurité catégorisés (Légal, Technique, Finance).
 
 ### 🏛️ Moteur de Gouvernance (Module AG)
+
 Gestion complète du cycle de vie des Assemblées Générales. De la planification automatique dans l'agenda unifié au suivi des votes en temps réel et à la génération de PV légaux.
 
 ### 📅 Agenda de Gouvernance Unifié
+
 Une timeline synchronisée qui fait le pont entre les jalons de gouvernance et les opérations quotidiennes. Supporte l'**Export ICS Universel** pour les agendas Google, Apple et Outlook.
 
 ### 🧠 Wiki Communautaire & Base de Connaissances
+
 Un hub d'intelligence centralisé pour le règlement de copropriété, l'historique de maintenance et le savoir collectif.
 
 ### 🚀 Cockpit de Bord (Dashboard)
+
 Un centre de commande haute performance offrant des KPIs en temps réel, un "Smart Matching" des artisans pour les interventions et un système de support premium.
 
 ---
@@ -44,33 +49,41 @@ Un centre de commande haute performance offrant des KPIs en temps réel, un "Sma
 ## 🚀 Démarrage Rapide
 
 ### 1. Cloner le dépôt
+
 ```bash
 git clone https://github.com/Masterjeremysu/Saas-Copro-multi.git
 cd coprosync-v3
 ```
 
 ### 2. Installer les dépendances
+
 ```bash
 npm install
 ```
 
 ### 3. Configuration de l'environnement
+
 Créez un fichier `.env.local` à la racine et ajoutez vos identifiants Supabase :
+
 ```env
 NEXT_PUBLIC_SUPABASE_URL=votre_url_projet
 NEXT_PUBLIC_SUPABASE_ANON_KEY=votre_cle_anon
 ```
 
 ### 4. Lancer le moteur
+
 ```bash
 npm run dev
 ```
+
 Ouvrez [http://localhost:3000](http://localhost:3000) pour témoigner de l'évolution.
 
 ---
 
 ## 💎 Philosophie Design
-CoproSync V3 repose sur le principe du **"SaaS de Prestige"**. 
+
+CoproSync V3 repose sur le principe du **"SaaS de Prestige"**.
+
 - **Mobile-First** : Chaque pixel est optimisé pour les expériences mobiles haut de gamme.
 - **Excellence Visuelle** : Palettes indigo profondes, modes sombres élégants et typographie soignée.
 - **Empowerment** : Des tâches administratives complexes simplifiées par une interface intuitive et interactive.
@@ -78,10 +91,9 @@ CoproSync V3 repose sur le principe du **"SaaS de Prestige"**.
 ---
 
 ## 📄 Licence
+
 Projet géré par **Masterjeremysu**. Suite d'Entreprise Interne.
 
 ---
 
-<p align="center">
-  <b>Développé avec passion pour la gouvernance moderne 🏢✨</b>
-</p>
+**Développé avec passion pour la gouvernance moderne 🏢✨**

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
-import { Building2, Key, Mail, Lock, User, Loader2, ArrowRight, ShieldAlert } from 'lucide-react';
+import { Key, Mail, Lock, User, Loader2, ArrowRight, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
