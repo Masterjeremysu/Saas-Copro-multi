@@ -75,17 +75,37 @@ export default function AuditLogPage() {
 
   return (
     <div className="p-6 md:p-12 space-y-12 max-w-[1600px] mx-auto animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-end gap-6">
-        <div className="space-y-2">
-          <Badge className="bg-indigo-50 text-indigo-700 border-indigo-100 px-4 py-1 rounded-full font-black text-[10px] uppercase tracking-[0.2em]">
-            Registre Officiel
-          </Badge>
-          <h1 className="text-5xl font-black tracking-tighter text-slate-900 leading-none">Journal d'Audit</h1>
-          <p className="text-slate-500 font-medium text-lg italic">Surveillance 360° des flux de la copropriété.</p>
+      {/* TACTICAL HERO - MISSION CONTROL STYLE */}
+      <div className="bg-[#0F172A] rounded-[2.5rem] lg:rounded-[4rem] p-8 lg:p-16 text-white relative overflow-hidden shadow-2xl mb-12 mx-2 lg:mx-0">
+        {/* Animated Background Orbs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-slate-500/10 rounded-full blur-[80px] -ml-32 -mb-32"></div>
+        
+        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+          <div className="space-y-6 text-center lg:text-left flex-1">
+            <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10">
+               <div className="h-2 w-2 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_#818cf8]"></div>
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Registre Certifié Live</span>
+            </div>
+            
+            <h1 className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic pr-4">
+               Journal <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">d&apos;Audit</span>
+            </h1>
+            
+            <div className="flex flex-col lg:flex-row items-center gap-4">
+              <p className="text-slate-400 font-medium text-sm lg:text-xl max-w-xl leading-relaxed mx-auto lg:mx-0">
+                 Surveillance 360° des flux et opérations de la copropriété. Transparence totale et traçabilité immuable.
+              </p>
+            </div>
+          </div>
+          
+          <div className="hidden lg:flex items-center gap-4">
+             <Button onClick={() => toast.success("Génération du rapport...")} className="h-32 w-32 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl flex flex-col items-center justify-center text-center hover:bg-white/10 transition-all border-none group">
+                <Download className="h-8 w-8 text-indigo-400 mb-2 group-hover:translate-y-1 transition-transform" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Exporter</p>
+             </Button>
+          </div>
         </div>
-        <Button onClick={() => toast.success("Génération du rapport...")} className="bg-slate-900 hover:bg-black text-white rounded-[1.5rem] h-14 px-8 font-bold flex gap-3 shadow-2xl transition-all active:scale-95">
-          <Download className="h-5 w-5" /> Exporter le Registre
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">

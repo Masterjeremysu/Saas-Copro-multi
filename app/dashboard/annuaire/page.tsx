@@ -45,21 +45,42 @@ export default function AnnuairePage() {
   return (
     <div className="p-4 lg:p-10 space-y-8 max-w-[1400px] mx-auto pb-32">
       
-      {/* HEADER */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 px-2 lg:px-0">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-indigo-100 dark:bg-white/5 rounded-xl text-indigo-600 dark:text-indigo-400">
-              <Users className="h-6 w-6" />
-            </div>
-            <h1 className="text-3xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white leading-none">Communauté</h1>
-          </div>
-          <p className="text-slate-500 font-medium text-sm lg:text-base italic tracking-tight">Annuaire officiel des résidents et du personnel.</p>
-        </div>
+      {/* TACTICAL HERO - MISSION CONTROL STYLE */}
+      <div className="bg-[#0F172A] rounded-[2.5rem] lg:rounded-[4rem] p-8 lg:p-16 text-white relative overflow-hidden shadow-2xl mx-2 lg:mx-0">
+        {/* Animated Background Orbs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-slate-500/10 rounded-full blur-[80px] -ml-32 -mb-32"></div>
         
-        <Badge variant="outline" className="bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 px-4 py-1.5 rounded-full font-bold text-[10px] uppercase tracking-widest flex items-center gap-2">
-          <Sparkles className="h-3 w-3 text-amber-500" /> {voisins.length} Membres
-        </Badge>
+        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+          <div className="space-y-6 text-center lg:text-left flex-1">
+            <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10">
+               <div className="h-2 w-2 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_#818cf8]"></div>
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Command Center Live</span>
+            </div>
+            
+            <h1 className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic pr-4">
+               Communauté <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Résidentielle</span>
+            </h1>
+            
+            <div className="flex flex-col lg:flex-row items-center gap-4">
+              <p className="text-slate-400 font-medium text-sm lg:text-xl max-w-xl leading-relaxed mx-auto lg:mx-0">
+                 Annuaire officiel des résidents et du personnel. Retrouvez vos voisins et les contacts clés de la résidence.
+              </p>
+              
+              <Badge variant="outline" className="bg-white/10 border-white/10 text-white px-4 py-2 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" /> {voisins.length} Membres
+              </Badge>
+            </div>
+          </div>
+          
+          <div className="hidden lg:flex items-center gap-4">
+             <div className="h-32 w-32 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl flex flex-col items-center justify-center text-center">
+                <Users className="h-8 w-8 text-indigo-400 mb-2" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Membres</p>
+                <p className="text-xl font-black">{voisins.length}</p>
+             </div>
+          </div>
+        </div>
       </div>
 
       {/* SEARCH BAR */}

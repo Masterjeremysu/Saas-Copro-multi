@@ -74,7 +74,7 @@ export default function LoginPage() {
           <div className="max-w-md w-full mx-auto space-y-10">
             
             <div className="space-y-2">
-              <h2 className="text-4xl font-black text-slate-900 tracking-tighter italic">Connexion</h2>
+              <h2 className="text-4xl font-black text-slate-900 tracking-tighter italic pr-4">Connexion</h2>
               <p className="text-slate-500 font-medium">Heureux de vous revoir parmi nous.</p>
             </div>
 

@@ -11,7 +11,8 @@ import {
   AlertCircle,
   ArrowRight,
   ShieldCheck,
-  Loader2
+  Loader2,
+  RotateCcw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -117,24 +118,44 @@ export default function ConseilPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 lg:p-10 animate-in fade-in duration-500 pb-32">
       
-      <div className="max-w-7xl mx-auto mb-10">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
-                <ShieldAlert className="h-6 w-6" />
-              </div>
-              <h1 className="text-2xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white italic leading-none uppercase">Espace Conseil</h1>
+      {/* TACTICAL HERO - MISSION CONTROL STYLE */}
+      <div className="bg-[#0F172A] rounded-[2.5rem] lg:rounded-[4rem] p-8 lg:p-16 text-white relative overflow-hidden shadow-2xl mb-10 mx-2 lg:mx-0">
+        {/* Animated Background Orbs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px] -ml-32 -mb-32"></div>
+        
+        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+          <div className="space-y-6 text-center lg:text-left flex-1">
+            <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10">
+               <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></div>
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Stratégie Live</span>
             </div>
-            <p className="text-slate-500 font-bold text-xs lg:text-sm uppercase tracking-widest pl-1">Pilotage Stratégique en Temps Réel</p>
+            
+            <h1 className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic pr-4">
+               Conseil <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Syndical</span>
+            </h1>
+            
+            <div className="flex flex-col lg:flex-row items-center gap-4">
+              <p className="text-slate-400 font-medium text-sm lg:text-xl max-w-xl leading-relaxed mx-auto lg:mx-0">
+                 Pilotage stratégique et surveillance en temps réel des actifs de la copropriété.
+              </p>
+              
+              <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-4 py-2 rounded-xl flex items-center gap-2 font-black text-[10px] uppercase tracking-widest">
+                <ShieldCheck className="h-3.5 w-3.5" /> Données Certifiées
+              </Badge>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Badge className="bg-emerald-500 text-white border-none px-4 py-2 rounded-xl flex items-center gap-2 font-black text-[10px] uppercase tracking-widest">
-              <ShieldCheck className="h-3.5 w-3.5" /> Données Certifiées
-            </Badge>
-            <Button variant="outline" onClick={() => loadData()} className="rounded-xl font-bold text-xs uppercase tracking-widest border-slate-200 dark:border-white/10">
-              Actualiser
-            </Button>
+          
+          <div className="hidden lg:flex items-center gap-4">
+             <div className="h-32 w-32 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl flex flex-col items-center justify-center text-center">
+                <ShieldAlert className="h-8 w-8 text-indigo-400 mb-2" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Membres</p>
+                <p className="text-xl font-black">{stats?.activeMembers || '0'}</p>
+             </div>
+             <Button variant="outline" onClick={() => loadData()} className="h-32 w-32 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl flex flex-col items-center justify-center text-center hover:bg-white/10 transition-all border-none">
+                <RotateCcw className="h-8 w-8 text-slate-400 mb-2" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Actualiser</p>
+             </Button>
           </div>
         </div>
       </div>

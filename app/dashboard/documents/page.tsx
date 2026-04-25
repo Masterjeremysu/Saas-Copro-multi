@@ -139,7 +139,7 @@ export default function DocumentsPage() {
                 <Badge className="bg-emerald-500/10 text-emerald-400 border-none px-4 py-1.5 uppercase text-[10px] font-black tracking-widest">
                   Coffre-fort Sécurisé
                 </Badge>
-                <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-white italic uppercase leading-none">
+                <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-white italic uppercase leading-none pr-4">
                   Document <span className="text-indigo-500">Vault</span>
                 </h1>
                 <p className="text-slate-400 font-bold max-w-xl">

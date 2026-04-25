@@ -92,7 +92,7 @@ export default function AssembleesPage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic"
+              className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic pr-4"
             >
                Assemblées <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Générales</span>
             </motion.h1>

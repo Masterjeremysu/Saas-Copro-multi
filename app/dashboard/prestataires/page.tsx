@@ -111,75 +111,99 @@ export default function PrestatairesPage() {
   return (
     <div className="p-6 lg:p-10 space-y-8 max-w-7xl mx-auto mb-20">
       
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <h1 className="text-4xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <HardHat className="h-10 w-10 text-indigo-600" /> Annuaire Technique
-          </h1>
-          <p className="text-slate-500 font-medium">Les professionnels accrédités pour intervenir sur la résidence.</p>
-        </div>
+      {/* TACTICAL HERO - MISSION CONTROL STYLE */}
+      <div className="bg-[#0F172A] rounded-[2.5rem] lg:rounded-[4rem] p-8 lg:p-16 text-white relative overflow-hidden shadow-2xl mb-10 mx-2 lg:mx-0">
+        {/* Animated Background Orbs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px] -ml-32 -mb-32"></div>
         
-        <HasRole roles={['administrateur', 'syndic']}>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-indigo-600 hover:bg-indigo-700 rounded-2xl h-12 px-6 font-black shadow-xl shadow-indigo-100">
-                <Plus className="mr-2 h-5 w-5" /> Ajouter un pro
-              </Button>
-            </DialogTrigger>
+        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+          <div className="space-y-6 text-center lg:text-left flex-1">
+            <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10">
+               <div className="h-2 w-2 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_#818cf8]"></div>
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Réseau Certifié Live</span>
+            </div>
             
-            <DialogContent className="rounded-[2.5rem] border-none shadow-2xl p-8 sm:max-w-[500px]">
-              <DialogHeader className="mb-6">
-                <DialogTitle className="text-2xl font-black tracking-tight text-slate-900">Nouveau Prestataire</DialogTitle>
-                <DialogDescription className="text-slate-500">
-                  Ajoutez les coordonnées d&apos;un artisan pour l&apos;intégrer à l&apos;annuaire de la copropriété.
-                </DialogDescription>
-              </DialogHeader>
-              
-              <form onSubmit={handleAddPrestataire} className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Raison Sociale / Nom</Label>
-                  <Input name="nom" placeholder="Ex: Plomberie Express" required className="h-12 rounded-xl bg-slate-50 border-none font-bold focus:ring-4 focus:ring-indigo-50" />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Spécialité Métier (Sous-nom)</Label>
-                  <select name="specialite" required className="flex h-12 w-full rounded-xl bg-slate-50 px-3 py-2 text-sm border-none font-bold focus:ring-4 focus:ring-indigo-50 outline-none">
-                    <option value="Plomberie">Plomberie</option>
-                    <option value="Électricité">Électricité</option>
-                    <option value="Chauffage">Chauffage</option>
-                    <option value="Toiture">Toiture</option>
-                    <option value="Serrurerie">Serrurerie</option>
-                    <option value="Ascenseur">Ascenseur</option>
-                    <option value="Espaces Verts">Espaces Verts</option>
-                    <option value="Parties Communes">Parties Communes</option>
-                    <option value="Gros Œuvre">Gros Œuvre</option>
-                    <option value="Autre">Autre</option>
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Téléphone</Label>
-                    <Input name="telephone" placeholder="06..." className="h-12 rounded-xl bg-slate-50 border-none font-bold focus:ring-4 focus:ring-indigo-50" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Email</Label>
-                    <Input name="email" type="email" placeholder="@" className="h-12 rounded-xl bg-slate-50 border-none font-bold focus:ring-4 focus:ring-indigo-50" />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Adresse</Label>
-                  <Input name="adresse" placeholder="15 rue des artisans..." className="h-12 rounded-xl bg-slate-50 border-none font-bold focus:ring-4 focus:ring-indigo-50" />
-                </div>
-
-                <Button type="submit" disabled={isSaving} className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 font-black text-lg text-white shadow-xl shadow-indigo-100 mt-6">
-                  {isSaving ? <Loader2 className="animate-spin h-6 w-6" /> : "Sauvegarder la fiche"}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </HasRole>
+            <h1 className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic pr-4">
+               Annuaire <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Technique</span>
+            </h1>
+            
+            <div className="flex flex-col lg:flex-row items-center gap-4">
+              <p className="text-slate-400 font-medium text-sm lg:text-xl max-w-xl leading-relaxed mx-auto lg:mx-0">
+                 Les professionnels accrédités pour intervenir sur la résidence. Expertise validée et réactivité garantie.
+              </p>
+            </div>
+          </div>
+          
+          <div className="hidden lg:flex items-center gap-4">
+             <div className="h-32 w-32 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl flex flex-col items-center justify-center text-center">
+                <HardHat className="h-8 w-8 text-indigo-400 mb-2" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Partenaires</p>
+                <p className="text-xl font-black">{prestataires.length}</p>
+             </div>
+             <HasRole roles={['administrateur', 'syndic']}>
+               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                 <DialogTrigger asChild>
+                   <Button className="h-32 w-32 rounded-[2rem] bg-white text-slate-900 flex flex-col items-center justify-center text-center hover:bg-slate-100 transition-all border-none">
+                      <Plus className="h-8 w-8 mb-2" />
+                      <p className="text-[10px] font-black uppercase tracking-widest">Ajouter</p>
+                   </Button>
+                 </DialogTrigger>
+                 <DialogContent className="rounded-[2.5rem] border-none shadow-2xl p-8 sm:max-w-[500px]">
+                   <DialogHeader className="mb-6">
+                     <DialogTitle className="text-2xl font-black tracking-tight text-slate-900">Nouveau Prestataire</DialogTitle>
+                     <DialogDescription className="text-slate-500">
+                       Ajoutez les coordonnées d&apos;un artisan pour l&apos;intégrer à l&apos;annuaire de la copropriété.
+                     </DialogDescription>
+                   </DialogHeader>
+                   
+                   <form onSubmit={handleAddPrestataire} className="space-y-4">
+                     <div className="space-y-2">
+                       <Label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Raison Sociale / Nom</Label>
+                       <Input name="nom" placeholder="Ex: Plomberie Express" required className="h-12 rounded-xl bg-slate-50 border-none font-bold focus:ring-4 focus:ring-indigo-50" />
+                     </div>
+                     
+                     <div className="space-y-2">
+                       <Label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Spécialité Métier (Sous-nom)</Label>
+                       <select name="specialite" required className="flex h-12 w-full rounded-xl bg-slate-50 px-3 py-2 text-sm border-none font-bold focus:ring-4 focus:ring-indigo-50 outline-none">
+                         <option value="Plomberie">Plomberie</option>
+                         <option value="Électricité">Électricité</option>
+                         <option value="Chauffage">Chauffage</option>
+                         <option value="Toiture">Toiture</option>
+                         <option value="Serrurerie">Serrurerie</option>
+                         <option value="Ascenseur">Ascenseur</option>
+                         <option value="Espaces Verts">Espaces Verts</option>
+                         <option value="Parties Communes">Parties Communes</option>
+                         <option value="Gros Œuvre">Gros Œuvre</option>
+                         <option value="Autre">Autre</option>
+                       </select>
+                     </div>
+     
+                     <div className="grid grid-cols-2 gap-4">
+                       <div className="space-y-2">
+                         <Label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Téléphone</Label>
+                         <Input name="telephone" placeholder="06..." className="h-12 rounded-xl bg-slate-50 border-none font-bold focus:ring-4 focus:ring-indigo-50" />
+                       </div>
+                       <div className="space-y-2">
+                         <Label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Email</Label>
+                         <Input name="email" type="email" placeholder="@" className="h-12 rounded-xl bg-slate-50 border-none font-bold focus:ring-4 focus:ring-indigo-50" />
+                       </div>
+                     </div>
+     
+                     <div className="space-y-2">
+                       <Label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Adresse</Label>
+                       <Input name="adresse" placeholder="15 rue des artisans..." className="h-12 rounded-xl bg-slate-50 border-none font-bold focus:ring-4 focus:ring-indigo-50" />
+                     </div>
+     
+                     <Button type="submit" disabled={isSaving} className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 font-black text-lg text-white shadow-xl shadow-indigo-100 mt-6">
+                       {isSaving ? <Loader2 className="animate-spin h-6 w-6" /> : "Sauvegarder la fiche"}
+                     </Button>
+                   </form>
+                 </DialogContent>
+               </Dialog>
+             </HasRole>
+          </div>
+        </div>
       </div>
 
       <div className="relative group max-w-md">
