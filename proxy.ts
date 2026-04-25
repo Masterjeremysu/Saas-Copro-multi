@@ -54,6 +54,6 @@ export const config = {
      * - icon-*.png (icons)
      * - apple-touch-icon.png (apple icons)
      */
-    '/((?!_next/static|_next/image|favicon.ico|manifest.json|icon-.*\\.png|apple-touch-icon.png).*)',
+    '/((?!_next/static|_next/image|favicon.ico|manifest.json|.*\\.png$|apple-touch-icon.png).*)',
   ],
 }
