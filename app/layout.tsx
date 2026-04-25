@@ -21,7 +21,6 @@ export const metadata: Metadata = {
   description: "Plateforme SaaS de gestion de copropriété. Signalements, votes, contrats, agenda et communication résidents en temps réel.",
   keywords: ["copropriété", "syndic", "gestion immobilière", "SaaS", "résidents", "signalements"],
   authors: [{ name: "CoproSync" }],
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -55,6 +54,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <head>
+        <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
+      </head>
       <body className="min-h-full flex flex-col">
         {children}
         <Toaster position="top-right" richColors closeButton />
