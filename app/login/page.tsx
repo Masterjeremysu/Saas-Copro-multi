@@ -52,7 +52,7 @@ export default function LoginPage() {
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] -mr-40 -mt-40"></div>
           
           <div className="relative z-10 flex items-center gap-3">
-            <Logo className="invert brightness-0" />
+            <Logo variant="white" />
           </div>
 
           <div className="relative z-10 space-y-6">
