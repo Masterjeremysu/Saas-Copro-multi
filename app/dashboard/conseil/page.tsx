@@ -131,8 +131,8 @@ export default function ConseilPage() {
                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Stratégie Live</span>
             </div>
             
-            <h1 className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic pr-10">
-               Conseil <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Syndical</span>
+            <h1 className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic pr-20">
+               Conseil <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Syndical&nbsp;</span>
             </h1>
             
             <div className="flex flex-col lg:flex-row items-center gap-4">

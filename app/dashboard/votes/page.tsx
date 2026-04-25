@@ -198,8 +198,8 @@ export default function VotesPage() {
                <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></div>
                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Command Center Live</span>
             </div>
-            <h1 className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic pr-10">
-               Centre de <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Décision</span>
+            <h1 className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic pr-20">
+               Centre de <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Décision&nbsp;</span>
             </h1>
             <p className="text-slate-400 font-medium text-sm lg:text-xl max-w-xl leading-relaxed mx-auto lg:mx-0">
                Gérez les résolutions officielles, sondez l&apos;opinion et planifiez l&apos;avenir de votre résidence avec précision tactique.

@@ -257,9 +257,9 @@ export default function AgendaPage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic pr-10"
+              className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic pr-20"
             >
-               Agenda <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Résidentiel</span>
+               Agenda <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Résidentiel&nbsp;</span>
             </motion.h1>
             
             <p className="text-slate-400 font-medium text-sm lg:text-xl max-w-xl leading-relaxed mx-auto lg:mx-0">
