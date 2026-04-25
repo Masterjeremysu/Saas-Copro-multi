@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { 
-  Ticket as TicketIcon, Plus, AlertCircle, 
+  Plus, AlertCircle, 
   CheckCircle2, Clock, 
   Loader2, GripVertical, ArrowRight
 } from 'lucide-react';
