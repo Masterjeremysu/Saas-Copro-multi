@@ -212,30 +212,54 @@ export default function CommunautePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#020617] animate-in fade-in duration-500 pb-20">
+    <div className="p-4 lg:p-10 space-y-10 max-w-[1600px] mx-auto animate-in fade-in duration-700 pb-32">
       
-      {/* HEADER PREMIUM */}
-      <div className="sticky top-0 z-40 bg-white/70 dark:bg-[#020617]/70 backdrop-blur-2xl border-b border-slate-200/60 dark:border-white/5 p-4 lg:p-6 shadow-sm">
-         <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 lg:gap-6">
-               <Link href="/dashboard" className="h-10 w-10 lg:h-12 lg:w-12 rounded-xl lg:rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 hover:text-indigo-600 transition-all shadow-sm">
-                  <ArrowLeft className="h-4 w-4 lg:h-5 lg:w-5" />
-               </Link>
-            <div>
-               <h1 className="text-lg lg:text-2xl font-black tracking-tighter text-slate-900 dark:text-white italic leading-none">Communauté</h1>
-               <p className="hidden sm:flex text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mt-1 items-center gap-2">
-                 <Sparkles className="h-3 w-3 text-indigo-500" /> Espace Intelligent
-               </p>
+      {/* TACTICAL HERO - MISSION CONTROL STYLE */}
+      <div className="bg-[#0F172A] rounded-[2.5rem] lg:rounded-[4rem] p-8 lg:p-16 text-white relative overflow-hidden shadow-2xl">
+        {/* Animated Background Orbs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-pink-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -ml-32 -mb-32"></div>
+        
+        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+          <div className="flex items-center gap-6 text-center lg:text-left flex-1">
+            <Link href="/dashboard" className="hidden lg:flex h-16 w-16 rounded-2xl bg-white/5 border border-white/10 items-center justify-center text-white hover:bg-white/10 transition-all shadow-xl group">
+               <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
+            </Link>
+            <div className="space-y-6 flex-1">
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10"
+              >
+                 <div className="h-2 w-2 rounded-full bg-pink-400 animate-pulse shadow-[0_0_8px_#f472b6]"></div>
+                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Espace Social Résidentiel</span>
+              </motion.div>
+              
+              <motion.h1 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic"
+              >
+                 La <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-pink-200 to-indigo-400">Communauté</span>
+              </motion.h1>
+              
+              <p className="text-slate-400 font-medium text-sm lg:text-xl max-w-xl leading-relaxed mx-auto lg:mx-0">
+                 Échangez, partagez et vivez ensemble dans un espace sécurisé et intelligent.
+              </p>
             </div>
-            </div>
-            <Button 
-              onClick={() => setShowPostBox(!showPostBox)}
-              className="h-10 lg:h-12 px-4 lg:px-6 rounded-xl lg:rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-600/20 font-black text-[10px] lg:text-xs uppercase tracking-widest transition-all active:scale-95"
-            >
-               {showPostBox ? <X className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
-               {showPostBox ? "ANNULER" : "PUBLIER"}
-            </Button>
-         </div>
+          </div>
+          
+          <div className="flex flex-col items-center gap-4">
+             <Button 
+                onClick={() => setShowPostBox(!showPostBox)}
+                className={`h-16 lg:h-24 px-8 lg:px-12 rounded-[1.5rem] lg:rounded-[2.5rem] ${showPostBox ? 'bg-rose-500 hover:bg-rose-600' : 'bg-indigo-600 hover:bg-indigo-700'} text-white shadow-2xl shadow-indigo-600/30 font-black text-xs lg:text-xl uppercase tracking-widest transition-all active:scale-95 group`}
+              >
+                 {showPostBox ? <X className="h-6 w-6 lg:h-8 lg:w-8 mr-4" /> : <Plus className="h-6 w-6 lg:h-8 lg:w-8 mr-4 group-hover:rotate-90 transition-transform" />}
+                 {showPostBox ? "ANNULER" : "PUBLIER UN MESSAGE"}
+              </Button>
+          </div>
+        </div>
       </div>
 
       <div className="max-w-[1400px] mx-auto px-4 lg:px-6 mt-6 lg:mt-8">

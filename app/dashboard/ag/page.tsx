@@ -65,37 +65,54 @@ export default function AssembleesPage() {
   const agPassees = assemblees.filter(ag => new Date(ag.date_tenue) <= new Date() && ag.statut === 'terminee').length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] animate-in fade-in duration-500 pb-20">
+    <div className="p-4 lg:p-10 space-y-10 max-w-[1600px] mx-auto animate-in fade-in duration-700 pb-32">
       
-      {/* HERO HEADER */}
-      <div className="bg-slate-900 pt-10 pb-20 px-6 lg:px-10 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-indigo-600/20 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-1/4 h-1/2 bg-blue-600/10 blur-[100px] rounded-full -translate-x-1/2 translate-y-1/2"></div>
+      {/* TACTICAL HERO - MISSION CONTROL STYLE */}
+      <div className="bg-[#0F172A] rounded-[2.5rem] lg:rounded-[4rem] p-8 lg:p-16 text-white relative overflow-hidden shadow-2xl">
+        {/* Animated Background Orbs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] -ml-32 -mb-32"></div>
         
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
-            <div className="space-y-4">
-              <Badge className="bg-indigo-500/10 text-indigo-400 border-none px-4 py-1.5 uppercase text-[10px] font-black tracking-widest">
-                Gouvernance & Décisions
-              </Badge>
-              <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-white italic uppercase leading-none">
-                Assemblées <span className="text-indigo-500">Générales</span>
-              </h1>
-              <p className="text-slate-400 font-bold max-w-xl">
-                Pilotez la vie démocratique de votre copropriété : planification, convocations et votes en temps réel.
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <AddAgModal />
-            </div>
+        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+          <div className="space-y-6 text-center lg:text-left flex-1">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10"
+            >
+               <div className="h-2 w-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#60a5fa]"></div>
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Centre Décisionnel AG</span>
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic"
+            >
+               Assemblées <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Générales</span>
+            </motion.h1>
+            
+            <p className="text-slate-400 font-medium text-sm lg:text-xl max-w-xl leading-relaxed mx-auto lg:mx-0">
+               Pilotez la vie démocratique de votre copropriété : planification, convocations et votes en temps réel.
+            </p>
           </div>
-
-          {/* QUICK STATS */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
-            <StatCard label="Prochaines" value={agAVenir} icon={CalendarDays} color="indigo" />
-            <StatCard label="Terminées" value={agPassees} icon={CheckCircle2} color="emerald" />
-            <StatCard label="Présence" value="74%" icon={Users} color="blue" />
-            <StatCard label="Décisions" value="12" icon={FileText} color="amber" />
+          
+          <div className="flex flex-col gap-6 w-full lg:w-auto">
+             <div className="flex justify-center lg:justify-end">
+                <AddAgModal />
+             </div>
+             
+             <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-4 rounded-2xl text-center">
+                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">À venir</p>
+                   <p className="text-2xl font-black text-white">{agAVenir}</p>
+                </div>
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-4 rounded-2xl text-center">
+                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Terminées</p>
+                   <p className="text-2xl font-black text-white">{agPassees}</p>
+                </div>
+             </div>
           </div>
         </div>
       </div>

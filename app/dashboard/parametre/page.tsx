@@ -136,22 +136,50 @@ export default function ParametrePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 lg:p-10 animate-in fade-in duration-500 pb-32">
-      <div className="max-w-4xl mx-auto space-y-8">
-
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h1 className="text-2xl lg:text-3xl font-black tracking-tighter text-slate-900 dark:text-white italic uppercase leading-none">Mon Profil</h1>
-            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">Gérez vos accès et préférences</p>
+    <div className="p-4 lg:p-10 space-y-10 max-w-[1600px] mx-auto animate-in fade-in duration-700 pb-32">
+      
+      {/* TACTICAL HERO - MISSION CONTROL STYLE */}
+      <div className="bg-[#0F172A] rounded-[2.5rem] lg:rounded-[4rem] p-8 lg:p-16 text-white relative overflow-hidden shadow-2xl">
+        {/* Animated Background Orbs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -ml-32 -mb-32"></div>
+        
+        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+          <div className="space-y-6 text-center lg:text-left flex-1">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10"
+            >
+               <div className="h-2 w-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_#60a5fa]"></div>
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Centre de Configuration</span>
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic"
+            >
+               Mon <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-200 to-indigo-400">Profil</span>
+            </motion.h1>
+            
+            <p className="text-slate-400 font-medium text-sm lg:text-xl max-w-xl leading-relaxed mx-auto lg:mx-0">
+               Gérez vos accès, vos préférences de notification et personnalisez votre expérience CoproSync.
+            </p>
           </div>
-          <Button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-6 font-black text-xs uppercase tracking-widest shadow-lg shadow-indigo-600/20"
-          >
-            {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Save className="h-4 w-4 mr-2" /> Enregistrer</>}
-          </Button>
+          
+          <div className="flex flex-col items-center gap-4">
+             <Button 
+                onClick={handleSave}
+                disabled={isSaving}
+                className="h-16 lg:h-24 px-8 lg:px-12 rounded-[1.5rem] lg:rounded-[2.5rem] bg-indigo-600 hover:bg-indigo-700 text-white shadow-2xl shadow-indigo-600/30 font-black text-xs lg:text-xl uppercase tracking-widest transition-all active:scale-95 group"
+              >
+                 {isSaving ? <Loader2 className="h-6 w-6 lg:h-8 lg:w-8 animate-spin" /> : <><Save className="h-6 w-6 lg:h-8 lg:w-8 mr-4 group-hover:scale-110 transition-transform" /> ENREGISTRER</>}
+              </Button>
+          </div>
         </div>
+      </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 

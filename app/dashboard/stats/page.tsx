@@ -96,23 +96,45 @@ export default function StatsPage() {
   if (isLoading) return <div className="p-10 text-center animate-pulse font-medium text-slate-400">Analyse des données en cours...</div>;
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="p-6 md:p-10 space-y-8 max-w-7xl mx-auto mb-20"
-    >
+    <div className="p-4 lg:p-10 space-y-10 max-w-[1600px] mx-auto animate-in fade-in duration-700 pb-32">
       
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-            <BarChart3 className="h-8 w-8 text-indigo-600" /> Analytics
-          </h1>
-          <p className="text-slate-500 font-medium mt-1">Rapport de performance de : {coproName}</p>
+      {/* TACTICAL HERO - MISSION CONTROL STYLE */}
+      <div className="bg-[#0F172A] rounded-[2.5rem] lg:rounded-[4rem] p-8 lg:p-16 text-white relative overflow-hidden shadow-2xl">
+        {/* Animated Background Orbs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -ml-32 -mb-32"></div>
+        
+        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+          <div className="space-y-6 text-center lg:text-left flex-1">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10"
+            >
+               <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></div>
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Intelligence Center</span>
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic"
+            >
+               Données <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Analytiques</span>
+            </motion.h1>
+            
+            <p className="text-slate-400 font-medium text-sm lg:text-xl max-w-xl leading-relaxed mx-auto lg:mx-0">
+               Suivez la performance et la santé de votre résidence en temps réel. Rapport complet de : <span className="text-white font-black">{coproName}</span>.
+            </p>
+          </div>
+          
+          <div className="flex flex-col items-center gap-4">
+             <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest animate-pulse">
+                LIVE DATA {currentYear}
+             </Badge>
+          </div>
         </div>
-        <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none px-4 py-1 rounded-full text-xs font-bold">
-          LIVE DATA {currentYear}
-        </Badge>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
