@@ -33,13 +33,6 @@ function consumeRateLimit(key: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    if (!adminSupabase) {
-      return NextResponse.json(
-        { error: 'Server misconfigured: SUPABASE_SERVICE_ROLE_KEY is missing' },
-        { status: 500 }
-      );
-    }
-
     let supabaseResponse = NextResponse.next({ request });
     const authSupabase = createServerClient(supabaseUrl, anonKey, {
       cookies: {
@@ -70,7 +63,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
     }
 
-    const { data: callerProfile, error: profileError } = await adminSupabase
+    // Prefer service-role for stable server-side reads; fallback to auth client if env is missing.
+    const dbSupabase = adminSupabase ?? authSupabase;
+
+    const { data: callerProfile, error: profileError } = await dbSupabase
       .from('profiles')
       .select('copropriete_id')
       .eq('id', user.id)
@@ -93,7 +89,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: artisans, error: artisansError } = await adminSupabase
+    const { data: artisans, error: artisansError } = await dbSupabase
       .from('profiles')
       .select('email, prenom, nom')
       .eq('copropriete_id', copropriete_id)
