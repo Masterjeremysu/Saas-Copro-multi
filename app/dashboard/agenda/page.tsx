@@ -1,15 +1,17 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { 
   Calendar as CalendarIcon, 
   ChevronLeft, ChevronRight, 
   Plus, Clock, 
   Vote, HardHat, Users, 
-  Info, Loader2, ArrowLeft, ChevronDown, FileText
+  Info, Loader2, ArrowLeft, ChevronDown, FileText,
+  PartyPopper, Zap, Filter
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { 
   Dialog, DialogContent, 
   DialogTitle, DialogDescription, DialogTrigger 
@@ -46,11 +48,13 @@ interface CategoryInfo {
 }
 
 const CATEGORIES: CategoryInfo[] = [
-  { id: 'ag', label: 'Assemblée Générale', color: 'bg-indigo-500', icon: <Users className="h-4 w-4" /> },
+  { id: 'all', label: 'Tout voir', color: 'bg-slate-900', icon: <Filter className="h-4 w-4" /> },
+  { id: 'alerte', label: 'Alerte Technique', color: 'bg-rose-600', icon: <Zap className="h-4 w-4" /> },
   { id: 'travaux', label: 'Travaux / Maintenance', color: 'bg-amber-500', icon: <HardHat className="h-4 w-4" /> },
-  { id: 'decision', label: 'Décision / Vote', color: 'bg-emerald-500', icon: <Vote className="h-4 w-4" /> },
+  { id: 'social', label: 'Vie de la Résidence', color: 'bg-emerald-500', icon: <PartyPopper className="h-4 w-4" /> },
+  { id: 'ag', label: 'Assemblée Générale', color: 'bg-indigo-600', icon: <Users className="h-4 w-4" /> },
   { id: 'reunion', label: 'Réunion CS / Syndic', color: 'bg-blue-500', icon: <Info className="h-4 w-4" /> },
-  { id: 'autre', label: 'Autre Événement', color: 'bg-slate-500', icon: <CalendarIcon className="h-4 w-4" /> },
+  { id: 'decision', label: 'Décision / Vote', color: 'bg-purple-500', icon: <Vote className="h-4 w-4" /> },
 ];
 
 export default function AgendaPage() {
@@ -59,6 +63,7 @@ export default function AgendaPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('all');
   
   const [formData, setFormData] = useState({
     titre: '',
@@ -105,6 +110,11 @@ export default function AgendaPage() {
     ));
     setIsLoading(false);
   }, [currentDate, supabase]);
+
+  const filteredEvents = useMemo(() => {
+    if (activeCategory === 'all') return events;
+    return events.filter(e => e.categorie === activeCategory);
+  }, [events, activeCategory]);
 
   useEffect(() => { loadEvents(); }, [loadEvents]);
 
@@ -314,7 +324,7 @@ export default function AgendaPage() {
                         onChange={e => setFormData({...formData, categorie: e.target.value})}
                         className="w-full h-14 rounded-2xl bg-slate-50 dark:bg-white/10 border-none px-4 font-bold text-sm focus:ring-2 focus:ring-indigo-600 outline-none appearance-none text-slate-900 dark:text-white"
                       >
-                        {CATEGORIES.map(c => (
+                        {CATEGORIES.filter(c => c.id !== 'all').map(c => (
                           <option key={c.id} value={c.id} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                             {c.label}
                           </option>
@@ -346,6 +356,24 @@ export default function AgendaPage() {
         </div>
       </div>
 
+      {/* BARRE DE FILTRES TACTIQUE */}
+      <div className="flex items-center gap-3 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0">
+        {CATEGORIES.map(cat => (
+          <button
+            key={cat.id}
+            onClick={() => setActiveCategory(cat.id)}
+            className={`flex items-center gap-2 px-6 py-3 rounded-2xl whitespace-nowrap font-black text-[10px] uppercase tracking-widest transition-all ${
+              activeCategory === cat.id 
+                ? `${cat.color} text-white shadow-xl shadow-current/20` 
+                : 'bg-white dark:bg-slate-900 text-slate-400 border border-slate-100 dark:border-white/5 hover:border-indigo-200'
+            }`}
+          >
+            {cat.icon}
+            {cat.label}
+          </button>
+        ))}
+      </div>
+
       {/* VUE HYBRIDE CALENDRIER / TIMELINE */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         
@@ -360,7 +388,7 @@ export default function AgendaPage() {
             
             <div className="grid grid-cols-7 gap-1">
               {calendarDays.map((day, idx) => {
-                const dayEvents = events.filter(e => isSameDay(new Date(e.date_event), day));
+                const dayEvents = filteredEvents.filter(e => isSameDay(new Date(e.date_event), day));
                 const isCurrentMonth = day.getMonth() === currentDate.getMonth();
                 
                 return (
@@ -412,13 +440,13 @@ export default function AgendaPage() {
               {isLoading ? (
                 [1,2,3].map(i => <div key={i} className="h-32 bg-slate-50 dark:bg-white/5 rounded-[2rem] animate-pulse" />)
               ) : (
-                events.length === 0 ? (
+                filteredEvents.length === 0 ? (
                   <div className="p-12 text-center bg-slate-50 dark:bg-white/5 rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10">
-                     <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Rien de prévu ce mois-ci</p>
+                     <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Rien de prévu ici</p>
                   </div>
                 ) : (
-                  events.map(event => {
-                    const cat = CATEGORIES.find(c => c.id === event.categorie) || CATEGORIES[4];
+                  filteredEvents.map(event => {
+                    const cat = CATEGORIES.find(c => c.id === event.categorie) || CATEGORIES[CATEGORIES.length - 1];
                     return (
                       <CardEvent key={event.id} event={event} category={cat} />
                     );
@@ -450,15 +478,24 @@ export default function AgendaPage() {
 }
 
 function CardEvent({ event, category }: { event: AgendaEvent; category: CategoryInfo }) {
+  const isAlerte = event.categorie === 'alerte';
+  
   return (
-    <div className="group bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-white/5 shadow-sm hover:shadow-xl hover:translate-x-1 transition-all duration-300">
+    <div className={`group p-6 rounded-[2rem] border transition-all duration-300 ${
+      isAlerte 
+        ? 'bg-rose-50/50 dark:bg-rose-950/10 border-rose-100 dark:border-rose-900/30' 
+        : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-white/5 shadow-sm'
+    } hover:shadow-xl hover:translate-x-1`}>
       <div className="flex items-start gap-4">
-        <div className={`h-12 w-12 rounded-2xl ${category.color} flex items-center justify-center text-white shrink-0 shadow-lg shadow-current/20`}>
+        <div className={`h-12 w-12 rounded-2xl ${category.color} flex items-center justify-center text-white shrink-0 shadow-lg shadow-current/20 group-hover:scale-110 transition-transform`}>
           {category.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">{category.label}</p>
-          <h3 className="text-lg font-black text-slate-900 dark:text-white truncate tracking-tighter leading-none mb-2">{event.titre}</h3>
+          <div className="flex justify-between items-start">
+            <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${isAlerte ? 'text-rose-600' : 'text-slate-400'}`}>{category.label}</p>
+            {isAlerte && <Badge className="bg-rose-600 text-white border-none text-[8px] animate-pulse">URGENT</Badge>}
+          </div>
+          <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tighter leading-none mb-2">{event.titre}</h3>
           <div className="flex flex-wrap gap-4 items-center">
              <div className="flex items-center gap-1.5 text-slate-500">
                 <CalendarIcon className="h-3.5 w-3.5" />
@@ -470,9 +507,11 @@ function CardEvent({ event, category }: { event: AgendaEvent; category: Category
              </div>
           </div>
           {event.description && (
-             <p className="mt-4 text-xs font-medium text-slate-400 line-clamp-2 italic">
-                &quot;{event.description}&quot;
-             </p>
+             <div className="mt-4 p-3 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-100/50 dark:border-white/5">
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 line-clamp-3 italic">
+                  &quot;{event.description}&quot;
+                </p>
+             </div>
           )}
         </div>
       </div>

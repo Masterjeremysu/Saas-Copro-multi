@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { 
   BookOpen, 
@@ -65,7 +65,19 @@ export default function WikiPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
 
   useEffect(() => {
     async function fetchWiki() {
@@ -90,40 +102,55 @@ export default function WikiPage() {
   return (
     <div className="min-h-full bg-[#F8FAFC] dark:bg-transparent">
       
-      {/* HERO SECTION - PREMIUM SEARCH */}
-      <div className="relative overflow-hidden bg-[#0F172A] pt-16 pb-24 px-6 lg:px-10 rounded-b-[3rem] lg:rounded-b-[4rem] shadow-2xl">
-        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[100px]"></div>
+      {/* HERO SECTION - CINEMATIC SEARCH */}
+      <div className="relative overflow-hidden bg-[#020617] pt-20 pb-32 px-6 lg:px-10 rounded-b-[3.5rem] lg:rounded-b-[5rem] shadow-2xl">
+        {/* Animated Background Elements */}
+        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px]"></div>
         
-        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8">
+        <div className="relative z-10 max-w-5xl mx-auto text-center space-y-10">
           <div className="space-y-4">
-            <Badge className="bg-indigo-500/20 text-indigo-300 border-none px-4 py-1 font-black uppercase tracking-widest text-[10px]">
-              Base de Connaissances
-            </Badge>
-            <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-white">
-              Wiki <span className="text-indigo-400">Résidence</span>
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-2 bg-indigo-500/10 backdrop-blur-md border border-indigo-500/20 text-indigo-300 px-5 py-2 rounded-full font-black uppercase tracking-widest text-[10px]"
+            >
+              <BookOpen className="h-3 w-3" /> Base de Connaissances CoproSync
+            </motion.div>
+            <h1 className="text-5xl lg:text-8xl font-black tracking-tighter text-white leading-none">
+              Wiki <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">Résidence</span>
             </h1>
-            <p className="text-slate-400 text-lg font-medium max-w-xl mx-auto">
-              Tout ce que vous devez savoir sur votre copropriété, de la sécurité aux petits détails du quotidien.
+            <p className="text-slate-400 text-lg lg:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
+              Toutes les clés pour maîtriser votre quotidien. Sécurité, règlement, vie pratique : votre savoir partagé.
             </p>
           </div>
 
-          <div className="relative group max-w-2xl mx-auto">
-            <Search className="absolute left-5 lg:left-6 top-1/2 -translate-y-1/2 h-5 w-5 lg:h-6 lg:w-6 text-slate-500 group-focus-within:text-indigo-500 transition-colors" />
-            <Input 
-              placeholder="Rechercher..." 
-              className="pl-14 lg:pl-16 h-14 lg:h-20 bg-white/10 backdrop-blur-xl border-white/10 rounded-2xl lg:rounded-[2rem] text-white placeholder:text-slate-500 text-base lg:text-xl font-bold focus:ring-4 focus:ring-indigo-500/20 transition-all border-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <div className="relative group max-w-3xl mx-auto">
+            <div className="absolute inset-0 bg-indigo-600/20 blur-2xl group-focus-within:bg-indigo-600/30 transition-all rounded-[2.5rem]"></div>
+            <div className="relative">
+              <Search className="absolute left-6 lg:left-8 top-1/2 -translate-y-1/2 h-6 w-6 lg:h-8 lg:w-8 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+              <Input 
+                ref={searchInputRef}
+                placeholder="Une question ? Une règle ? Un code ?" 
+                className="pl-16 lg:pl-20 h-16 lg:h-24 bg-white/5 backdrop-blur-2xl border-white/10 rounded-[2rem] lg:rounded-[2.5rem] text-white placeholder:text-slate-600 text-lg lg:text-2xl font-bold focus:ring-0 transition-all border-none shadow-2xl"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                 <kbd className="hidden lg:flex h-8 items-center gap-1 rounded border border-white/10 bg-white/5 px-2 font-mono text-[10px] font-medium text-slate-500">
+                    <span className="text-xs">⌘</span>K
+                 </kbd>
+              </div>
+            </div>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-2 lg:gap-3 max-w-md mx-auto">
-            {['Code poubelles', 'Interphone', 'Local vélos', 'Eau'].map(tag => (
+          <div className="flex flex-wrap justify-center gap-2 lg:gap-4 max-w-2xl mx-auto">
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 py-2 mr-2">Top Recherches :</span>
+            {['Code poubelles', 'Badge local vélos', 'Règlement intérieur', 'Coupure eau'].map(tag => (
               <button 
                 key={tag}
                 onClick={() => setSearchTerm(tag)}
-                className="text-[10px] lg:text-xs font-bold text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 lg:px-4 lg:py-2 rounded-full transition-all border border-white/5 whitespace-nowrap"
+                className="text-[10px] lg:text-xs font-black text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 lg:px-6 lg:py-3 rounded-2xl transition-all border border-white/5 whitespace-nowrap active:scale-95"
               >
                 {tag}
               </button>
@@ -135,25 +162,30 @@ export default function WikiPage() {
       <div className="p-6 lg:p-10 -mt-12 space-y-12">
         
         {/* CATEGORIES NAVIGATION */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 max-w-7xl mx-auto">
           {CATEGORIES.map((cat) => (
             <button
               key={cat.name}
               onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
               className={`
-                p-8 rounded-[3rem] flex flex-col items-start gap-4 transition-all border shadow-sm group
+                p-6 lg:p-10 rounded-[2.5rem] lg:rounded-[3.5rem] flex flex-col items-center lg:items-start gap-4 transition-all border shadow-sm group relative overflow-hidden
                 ${selectedCategory === cat.name 
-                  ? 'bg-indigo-600 border-indigo-600 text-white shadow-xl shadow-indigo-600/30 -translate-y-2' 
-                  : 'bg-white dark:bg-white/5 border-slate-100 dark:border-white/5 hover:border-indigo-500/50 hover:shadow-xl'}
+                  ? 'bg-indigo-600 border-indigo-600 text-white shadow-2xl shadow-indigo-600/40 -translate-y-2' 
+                  : 'bg-white dark:bg-slate-900/50 border-slate-100 dark:border-white/5 hover:border-indigo-500/50 hover:shadow-xl hover:-translate-y-1'}
               `}
             >
-              <div className={`p-4 rounded-2xl transition-transform group-hover:scale-110 ${selectedCategory === cat.name ? 'bg-white/20' : cat.bg}`}>
-                <cat.icon className={`h-8 w-8 ${selectedCategory === cat.name ? 'text-white' : cat.color}`} />
+              <div className={`p-4 lg:p-6 rounded-2xl lg:rounded-3xl transition-all duration-500 group-hover:rotate-12 ${selectedCategory === cat.name ? 'bg-white/20' : cat.bg}`}>
+                <cat.icon className={`h-8 w-8 lg:h-10 lg:w-10 ${selectedCategory === cat.name ? 'text-white' : cat.color}`} />
               </div>
-              <div className="text-left">
-                <span className="text-sm font-black uppercase tracking-wider block">{cat.name}</span>
-                <span className={`text-[10px] font-bold ${selectedCategory === cat.name ? 'text-indigo-100' : 'text-slate-400'}`}>{cat.desc}</span>
+              <div className="text-center lg:text-left space-y-1">
+                <span className="text-xs lg:text-base font-black uppercase tracking-wider block">{cat.name}</span>
+                <span className={`text-[9px] lg:text-[11px] font-bold uppercase tracking-tighter opacity-70 ${selectedCategory === cat.name ? 'text-indigo-100' : 'text-slate-400'}`}>{cat.desc}</span>
               </div>
+              
+              {/* Subtle Indicator */}
+              {selectedCategory === cat.name && (
+                <motion.div layoutId="category-indicator" className="absolute top-4 right-4 h-2 w-2 rounded-full bg-white shadow-lg shadow-white/50" />
+              )}
             </button>
           ))}
         </div>
@@ -189,52 +221,57 @@ export default function WikiPage() {
             className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8"
           >
             {isLoading ? (
-              <div className="col-span-full py-20 text-center"><Loader2 className="animate-spin mx-auto text-indigo-600" /></div>
+              <div className="col-span-full py-20 text-center"><Loader2 className="animate-spin mx-auto text-indigo-600 h-10 w-10" /></div>
             ) : filtered.length === 0 ? (
-              <div className="col-span-full py-20 text-center bg-white dark:bg-white/5 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-white/10">
-                <p className="text-slate-500 font-bold">Aucun article trouvé pour cette recherche.</p>
+              <div className="col-span-full py-20 text-center bg-white dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-white/10">
+                <p className="text-slate-500 font-black uppercase tracking-widest text-xs">Aucun article trouvé</p>
               </div>
             ) : filtered.map((art) => (
               <motion.div
                 key={art.id}
                 variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0 }
+                  hidden: { opacity: 0, scale: 0.95, y: 20 },
+                  visible: { opacity: 1, scale: 1, y: 0 }
                 }}
               >
                 <Link 
                   href={`/dashboard/wiki/${art.id}`}
-                  className="bg-white dark:bg-white/5 p-8 rounded-[3rem] border border-slate-100 dark:border-white/5 shadow-sm hover:shadow-2xl transition-all group flex flex-col relative overflow-hidden h-full"
+                  className="bg-white dark:bg-slate-900/50 p-8 rounded-[2.5rem] lg:rounded-[3.5rem] border border-slate-100 dark:border-white/5 shadow-sm hover:shadow-[0_20px_50px_rgba(79,70,229,0.1)] transition-all group flex flex-col relative overflow-hidden h-full active:scale-[0.98]"
                 >
-                  <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-all -translate-y-2 group-hover:translate-y-0">
-                    <ArrowUpRight className="h-6 w-6 text-indigo-600" />
+                  <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-100 transition-all -translate-y-2 group-hover:translate-y-0 text-indigo-600">
+                    <ArrowUpRight className="h-8 w-8" />
                   </div>
 
-                  <div className="flex items-center gap-2 mb-6">
-                    <Badge className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-none px-3 py-1 uppercase text-[8px] font-black">
+                  <div className="flex items-center gap-3 mb-8">
+                    <Badge className="bg-indigo-600 text-white border-none px-4 py-1.5 uppercase text-[9px] font-black tracking-widest rounded-xl">
                       {art.categorie}
                     </Badge>
-                    <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold">
-                      <Clock className="h-3 w-3" /> 3 min
+                    <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-black uppercase tracking-tighter">
+                      <Clock className="h-3.5 w-3.5" /> 4 min
                     </div>
                   </div>
 
-                  <h3 className="text-xl font-black text-slate-900 dark:text-white mb-4 group-hover:text-indigo-600 transition-colors">
+                  <h3 className="text-2xl lg:text-3xl font-black text-slate-900 dark:text-white mb-6 group-hover:text-indigo-600 transition-colors tracking-tighter leading-none">
                     {art.titre}
                   </h3>
                   
-                  <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-3 font-medium leading-relaxed mb-8">
+                  <p className="text-slate-500 dark:text-slate-400 text-sm lg:text-base line-clamp-3 font-medium leading-relaxed mb-10">
                     {art.contenu}
                   </p>
 
-                  <div className="mt-auto pt-6 border-t border-slate-50 dark:border-white/5 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="h-6 w-6 rounded-full bg-slate-100 dark:bg-white/10 border border-white dark:border-white/10 shadow-sm flex items-center justify-center text-[10px] font-black text-slate-500">
-                        AD
+                  <div className="mt-auto pt-8 border-t border-slate-50 dark:border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center text-white text-[10px] font-black shadow-lg shadow-indigo-600/20">
+                        {art.categorie.charAt(0)}
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400">Par Admin Copro</span>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] font-black uppercase text-slate-900 dark:text-white block tracking-widest">Expert Copro</span>
+                        <span className="text-[9px] font-bold text-slate-400 block uppercase">Administrateur</span>
+                      </div>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-indigo-600 transition-all" />
+                    <div className="h-10 w-10 rounded-2xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-500/10 transition-all">
+                      <ChevronRight className="h-5 w-5" />
+                    </div>
                   </div>
                 </Link>
               </motion.div>

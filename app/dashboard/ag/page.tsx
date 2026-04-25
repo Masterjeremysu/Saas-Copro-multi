@@ -5,7 +5,7 @@ import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { 
   Search, Users, CalendarDays, FileText, 
-  CheckCircle2, Clock, MapPin, Plus, Loader2, PlayCircle, FileSignature,
+  CheckCircle2, Clock, MapPin, Loader2, PlayCircle,
   ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,10 +15,20 @@ import { format, differenceInDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { AddAgModal } from './add-ag-modal'; 
-import { motion } from 'framer-motion';
+import { useCallback } from 'react';
+
+interface Assemblee {
+  id: string;
+  titre: string;
+  date_tenue: string;
+  lieu: string;
+  statut: 'brouillon' | 'convoquee' | 'en_cours' | 'terminee';
+  copropriete_id: string;
+  resolutions?: { count: number }[];
+}
 
 export default function AssembleesPage() {
-  const [assemblees, setAssemblees] = useState<any[]>([]);
+  const [assemblees, setAssemblees] = useState<Assemblee[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'tous' | 'prochaines' | 'passees'>('prochaines');
@@ -26,19 +36,21 @@ export default function AssembleesPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  const fetchAGs = async () => {
-    setLoading(true);
+  const fetchAGs = useCallback(async (showLoading = false) => {
+    if (showLoading) setLoading(true);
     const { data, error } = await supabase
       .from('assemblees')
       .select('*, resolutions(count)')
       .order('date_tenue', { ascending: true });
 
     if (error) toast.error("Erreur de chargement des AG");
-    else setAssemblees(data || []);
+    else setAssemblees((data as unknown as Assemblee[]) || []);
     setLoading(false);
-  };
+  }, [supabase]);
 
-  useEffect(() => { fetchAGs(); }, []);
+  useEffect(() => { 
+    fetchAGs(); 
+  }, [fetchAGs]);
 
   const filteredAGs = assemblees.filter(ag => {
     const matchesSearch = ag.titre?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -152,7 +164,14 @@ export default function AssembleesPage() {
   );
 }
 
-function StatCard({ label, value, icon: Icon, color }: any) {
+interface StatCardProps {
+  label: string;
+  value: string | number;
+  icon: React.ComponentType<{ className?: string }>;
+  color: 'indigo' | 'emerald' | 'blue' | 'amber';
+}
+
+function StatCard({ label, value, icon: Icon, color }: StatCardProps) {
   const colors = {
     indigo: 'text-indigo-400 bg-indigo-500/10',
     emerald: 'text-emerald-400 bg-emerald-500/10',
@@ -172,7 +191,13 @@ function StatCard({ label, value, icon: Icon, color }: any) {
   );
 }
 
-function FilterButton({ active, label, onClick }: any) {
+interface FilterButtonProps {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+}
+
+function FilterButton({ active, label, onClick }: FilterButtonProps) {
   return (
     <button
       onClick={onClick}
@@ -186,7 +211,7 @@ function FilterButton({ active, label, onClick }: any) {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const configs: any = {
+  const configs: Record<string, { label: string, bg: string, text: string, icon: React.ComponentType<{ className?: string }> }> = {
     terminee: { label: 'Terminée', bg: 'bg-emerald-50 dark:bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400', icon: CheckCircle2 },
     en_cours: { label: 'En séance', bg: 'bg-blue-50 dark:bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400', icon: PlayCircle },
     convoquee: { label: 'Convoquée', bg: 'bg-amber-50 dark:bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400', icon: Clock },
@@ -201,7 +226,12 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function AGRow({ ag, router }: any) {
+interface AGComponentProps {
+  ag: Assemblee;
+  router: ReturnType<typeof useRouter>;
+}
+
+function AGRow({ ag, router }: AGComponentProps) {
   const daysUntil = differenceInDays(new Date(ag.date_tenue), new Date());
   return (
     <tr 
@@ -241,7 +271,7 @@ function AGRow({ ag, router }: any) {
   );
 }
 
-function AGCard({ ag, router }: any) {
+function AGCard({ ag, router }: AGComponentProps) {
   const daysUntil = differenceInDays(new Date(ag.date_tenue), new Date());
   return (
     <div 

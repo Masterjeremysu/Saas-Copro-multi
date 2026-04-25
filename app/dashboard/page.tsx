@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { SupportModal } from './support-modal';
+import { motion } from 'framer-motion';
 
 interface TicketComment {
   id: string;
@@ -439,35 +440,26 @@ export default function OverviewPage() {
         
         {/* ACTIVITÉ RÉCENTE */}
         <div className="lg:col-span-2 space-y-4 lg:space-y-6">
-          <div className="flex items-center justify-between px-2 lg:px-4">
+          <div className="flex items-center justify-between px-2 lg:px-4 mb-2">
             <h3 className="text-xl lg:text-2xl font-black tracking-tighter text-slate-900 dark:text-white flex items-center gap-2">
               <MessageSquare className="h-5 w-5 lg:h-6 lg:w-6 text-indigo-600" /> Flux d&apos;activité
             </h3>
-            <Button variant="ghost" className="text-[10px] lg:text-xs font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600">Tout voir</Button>
+            <Link href="/dashboard/activite">
+              <Button variant="ghost" className="text-[10px] lg:text-xs font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600">Tout voir</Button>
+            </Link>
           </div>
           
-          <div className="bg-white dark:bg-slate-900/50 rounded-[2rem] lg:rounded-[3rem] p-6 lg:p-8 border border-slate-100 dark:border-slate-800 shadow-sm space-y-6 lg:space-y-8">
+          <div className="relative pl-4 lg:pl-8 space-y-6 lg:space-y-8">
+            {/* Timeline Line */}
+            <div className="absolute left-[11px] lg:left-[23px] top-4 bottom-4 w-[2px] bg-gradient-to-b from-indigo-500/50 via-slate-200 dark:via-slate-800 to-transparent"></div>
+
             {data?.recentActivity.length === 0 ? (
-              <p className="text-slate-400 italic text-center py-10 text-sm">Aucune activité récente.</p>
+              <div className="bg-white dark:bg-slate-900/50 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 text-center italic text-slate-400 text-sm">
+                Aucune activité récente.
+              </div>
             ) : (
-              data?.recentActivity.map((act) => (
-                <div key={act.id} className="flex gap-4 lg:gap-6 items-start group">
-                  <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-xl lg:rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                    {act.auteur.role === 'artisan' ? <Wrench className="h-5 w-5 lg:h-6 lg:w-6 text-indigo-500" /> : <Users className="h-5 w-5 lg:h-6 lg:w-6 text-slate-400" />}
-                  </div>
-                  <div className="flex-1 space-y-1 min-w-0">
-                    <div className="flex justify-between items-start gap-2">
-                      <p className="text-xs lg:text-sm font-black text-slate-900 dark:text-white leading-tight line-clamp-2">
-                        {act.auteur.prenom} {act.auteur.nom} <span className="text-slate-400 font-medium">sur</span> {act.ticket.titre}
-                      </p>
-                      <span className="text-[8px] lg:text-[10px] text-slate-300 font-bold uppercase shrink-0">{new Date(act.created_at).toLocaleDateString('fr-FR')}</span>
-                    </div>
-                    <p className="text-xs lg:text-sm text-slate-500 dark:text-slate-400 line-clamp-1 lg:line-clamp-2 italic">&quot;{act.message}&quot;</p>
-                    <Link href={`/dashboard/tickets/${act.ticket.id}`} className="inline-block pt-1 lg:pt-2">
-                      <span className="text-[9px] lg:text-[10px] font-black uppercase text-indigo-600 hover:underline">Voir le dossier</span>
-                    </Link>
-                  </div>
-                </div>
+              data?.recentActivity.map((act, index) => (
+                <ActivityItem key={act.id} act={act} index={index} />
               ))
             )}
           </div>
@@ -572,6 +564,74 @@ function StatCard({ title, value, subtitle, icon, color, trend, href }: {
   return CardContent;
 }
 
+function ActivityItem({ act, index }: { act: TicketComment; index: number }) {
+  return (
+    <motion.div 
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.1 }}
+      className="relative flex gap-4 lg:gap-6 items-start group"
+    >
+      {/* Timeline Dot */}
+      <div className="absolute left-[-9px] lg:left-[-21px] top-4 h-5 w-5 rounded-full bg-white dark:bg-slate-900 border-2 border-indigo-500 z-10 flex items-center justify-center group-hover:scale-125 transition-transform shadow-lg shadow-indigo-500/20">
+        <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
+      </div>
+
+      <div className="flex-1 bg-white/60 dark:bg-slate-900/40 backdrop-blur-md p-5 lg:p-6 rounded-[1.5rem] lg:rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm group-hover:shadow-xl group-hover:border-indigo-200/50 dark:group-hover:border-indigo-500/30 transition-all duration-500">
+        <div className="flex gap-4 lg:gap-5 items-start">
+          <div className={`h-10 w-10 lg:h-12 lg:w-12 rounded-xl lg:rounded-2xl flex items-center justify-center shrink-0 shadow-inner ${
+            act.auteur.role === 'artisan' 
+              ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10' 
+              : 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10'
+          }`}>
+            {act.auteur.role === 'artisan' ? <Wrench className="h-5 w-5 lg:h-6 lg:w-6" /> : <Users className="h-5 w-5 lg:h-6 lg:w-6" />}
+          </div>
+
+          <div className="flex-1 space-y-2 min-w-0">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+              <p className="text-xs lg:text-sm font-black text-slate-900 dark:text-white flex flex-wrap items-center gap-x-1.5">
+                <span className="text-indigo-600 dark:text-indigo-400">{act.auteur.prenom} {act.auteur.nom}</span>
+                <span className="text-slate-400 font-bold uppercase text-[9px] tracking-widest">sur</span>
+                <span className="truncate max-w-[200px]">{act.ticket.titre}</span>
+              </p>
+              <span className="text-[8px] lg:text-[9px] text-slate-400 font-black uppercase tracking-tighter bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full self-start sm:self-auto">
+                {new Date(act.created_at).toLocaleDateString('fr-FR')}
+              </span>
+            </div>
+
+            <div className="bg-slate-50/50 dark:bg-slate-800/30 p-3 lg:p-4 rounded-xl lg:rounded-2xl border border-slate-100/50 dark:border-slate-700/30">
+              <p className="text-xs lg:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+                {formatActivityMessage(act.message)}
+              </p>
+            </div>
+
+            <div className="flex justify-end">
+              <Link href={`/dashboard/tickets/${act.ticket.id}`} className="group/link flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
+                <span className="text-[9px] lg:text-[10px] font-black uppercase text-indigo-600 tracking-widest">Voir le dossier</span>
+                <ArrowRight className="h-3 w-3 text-indigo-600 group-hover/link:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function formatActivityMessage(message: string) {
+  // Rendu pour le gras **texte** et l'italique *texte*
+  const parts = message.split(/(\*\*.*?\*\*|\*.*?\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} className="text-slate-900 dark:text-white font-black">{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('*') && part.endsWith('*')) {
+      return <em key={i} className="text-slate-500 dark:text-slate-400 italic">{part.slice(1, -1)}</em>;
+    }
+    return part;
+  });
+}
+
 function EventCard({ icon, title, date, type, status, color }: {
   icon: React.ReactNode;
   title: string;
@@ -603,4 +663,4 @@ function EventCard({ icon, title, date, type, status, color }: {
       </div>
     </div>
   );
-}
+}

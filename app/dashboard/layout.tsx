@@ -108,10 +108,10 @@ export default function DashboardLayout({
   // Fermer la sidebar lors d'une navigation pour éviter les rendus en cascade
   useEffect(() => { 
     const timer = setTimeout(() => {
-      if (sidebarOpen) setSidebarOpen(false);
+      setSidebarOpen(false);
     }, 0);
     return () => clearTimeout(timer);
-  }, [pathname]); // On garde un tableau de taille constante [pathname]
+  }, [pathname]); // On ne déclenche l'effet que lors d'un changement de page
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

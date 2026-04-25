@@ -13,9 +13,30 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { motion } from 'framer-motion';
+
+interface Ticket {
+  id: string;
+  statut: string;
+  categorie: string;
+  urgence: 'critique' | 'normale' | 'basse';
+  [key: string]: unknown;
+}
+
+interface StatsData {
+  total: number;
+  resolved: number;
+  pending: number;
+  byCategory: Record<string, number>;
+  byUrgence: {
+    critique: number;
+    normale: number;
+    basse: number;
+  };
+}
 
 export default function StatsPage() {
-  const [data, setData] = useState<any>({
+  const [data, setData] = useState<StatsData>({
     total: 0,
     resolved: 0,
     pending: 0,
@@ -39,7 +60,7 @@ export default function StatsPage() {
           .single();
         
         // LE FIX EST ICI
-        const profile = rawProfile as any;
+        const profile = rawProfile as unknown as { copropriete: { nom: string } | { nom: string }[] };
         
         if (profile?.copropriete) {
           const nomDeLaCopro = Array.isArray(profile.copropriete) 
@@ -54,7 +75,7 @@ export default function StatsPage() {
       const { data: tickets } = await supabase.from('tickets').select('*');
       
       if (tickets) {
-        const stats = tickets.reduce((acc: any, t: any) => {
+        const stats = (tickets as Ticket[]).reduce((acc: StatsData, t: Ticket) => {
           acc.total++;
           if (t.statut === 'résolu') acc.resolved++;
           else acc.pending++;
@@ -68,14 +89,19 @@ export default function StatsPage() {
       setIsLoading(false);
     }
     loadData();
-  }, []);
+  }, [supabase]);
 
   const resolutionRate = data.total > 0 ? Math.round((data.resolved / data.total) * 100) : 0;
 
   if (isLoading) return <div className="p-10 text-center animate-pulse font-medium text-slate-400">Analyse des données en cours...</div>;
 
   return (
-    <div className="p-6 md:p-10 space-y-8 max-w-7xl mx-auto mb-20">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="p-6 md:p-10 space-y-8 max-w-7xl mx-auto mb-20"
+    >
       
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
@@ -105,8 +131,8 @@ export default function StatsPage() {
           </CardHeader>
           <CardContent className="p-8">
             <div className="space-y-6">
-              {Object.entries(data.byCategory).map(([cat, count]: any) => {
-                const percentage = Math.round((count / data.total) * 100);
+              {Object.entries(data.byCategory).map(([cat, count]) => {
+                const percentage = data.total > 0 ? Math.round((count / data.total) * 100) : 0;
                 return (
                   <div key={cat} className="space-y-2">
                     <div className="flex justify-between text-sm font-bold">
@@ -114,10 +140,12 @@ export default function StatsPage() {
                       <span className="text-slate-900">{count} ({percentage}%)</span>
                     </div>
                     <div className="h-4 bg-slate-100 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-indigo-600 transition-all duration-1000 ease-out" 
-                        style={{ width: `${percentage}%` }}
-                      ></div>
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${percentage}%` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        className="h-full bg-indigo-600"
+                      ></motion.div>
                     </div>
                   </div>
                 );
@@ -129,7 +157,7 @@ export default function StatsPage() {
         <Card className="rounded-[2.5rem] border-slate-100 shadow-sm bg-[#0F172A] text-white">
           <CardHeader className="p-8 pb-0">
             <CardTitle className="text-lg font-bold flex items-center gap-2">
-              Niveaux d'urgence
+              Niveaux d&apos;urgence
             </CardTitle>
           </CardHeader>
           <CardContent className="p-8 space-y-8">
@@ -137,39 +165,56 @@ export default function StatsPage() {
             <UrgenceRow label="Normale" count={data.byUrgence.normale} color="bg-amber-500" />
             <UrgenceRow label="Basse" count={data.byUrgence.basse} color="bg-indigo-400" />
             
-            <div className="mt-10 p-6 bg-white/5 rounded-3xl border border-white/10">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Note IA</p>
-              <p className="text-sm mt-2 text-slate-300 leading-relaxed italic">
-                "Le volume d'incidents est stable. Concentrez les efforts sur la catégorie <strong>{Object.keys(data.byCategory)[0] || '...'}</strong> qui représente la majorité des plaintes."
+            <div className="mt-10 p-6 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-md">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse"></div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Intelligence Artificielle</p>
+              </div>
+              <p className="text-sm text-slate-300 leading-relaxed italic">
+                &quot;Le volume d&apos;incidents est stable. Concentrez les efforts sur la catégorie <strong>{Object.keys(data.byCategory)[0] || '...'}</strong> qui représente la majorité des plaintes.&quot;
               </p>
             </div>
           </CardContent>
         </Card>
       </div>
-    </div>
+      </motion.div>
   );
 }
 
-function StatCard({ title, value, icon, trend, up, down }: any) {
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+  trend: string;
+  up?: boolean;
+  down?: boolean;
+}
+
+function StatCard({ title, value, icon, trend, up, down }: StatCardProps) {
   return (
-    <Card className="rounded-[2rem] border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start">
-          <div className="p-3 bg-slate-50 rounded-2xl">{icon}</div>
-          <div className={`flex items-center text-[10px] font-bold ${up ? 'text-emerald-600' : down ? 'text-rose-600' : 'text-slate-400'}`}>
-            {trend} {up && <ArrowUpRight className="h-3 w-3 ml-1" />} {down && <ArrowDownRight className="h-3 w-3 ml-1" />}
+    <motion.div
+      whileHover={{ y: -5 }}
+      transition={{ type: "spring", stiffness: 300 }}
+    >
+      <Card className="rounded-[2rem] border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+        <CardContent className="p-6">
+          <div className="flex justify-between items-start">
+            <div className="p-3 bg-slate-50 rounded-2xl">{icon}</div>
+            <div className={`flex items-center text-[10px] font-bold ${up ? 'text-emerald-600' : down ? 'text-rose-600' : 'text-slate-400'}`}>
+              {trend} {up && <ArrowUpRight className="h-3 w-3 ml-1" />} {down && <ArrowDownRight className="h-3 w-3 ml-1" />}
+            </div>
           </div>
-        </div>
-        <div className="mt-4">
-          <p className="text-3xl font-black text-slate-900">{value}</p>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-tight mt-1">{title}</p>
-        </div>
-      </CardContent>
-    </Card>
+          <div className="mt-4">
+            <p className="text-3xl font-black text-slate-900">{value}</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-tight mt-1">{title}</p>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 
-function UrgenceRow({ label, count, color }: any) {
+function UrgenceRow({ label, count, color }: { label: string; count: number; color: string }) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">

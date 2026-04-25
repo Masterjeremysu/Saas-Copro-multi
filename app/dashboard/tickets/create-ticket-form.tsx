@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import Image from 'next/image';
 import { notifyCopropriete } from '@/utils/notification-service';
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ export function CreateTicketForm({ onTicketCreated }: { onTicketCreated: () => v
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const supabase = createClient();
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -87,6 +89,17 @@ export function CreateTicketForm({ onTicketCreated }: { onTicketCreated: () => v
     }
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0] || null;
+    setFile(selectedFile);
+    if (selectedFile) {
+      const url = URL.createObjectURL(selectedFile);
+      setPreviewUrl(url);
+    } else {
+      setPreviewUrl(null);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -142,12 +155,34 @@ export function CreateTicketForm({ onTicketCreated }: { onTicketCreated: () => v
           </div>
 
           <div className="space-y-2 pt-2">
+            {previewUrl && (
+              <div className="relative w-full h-32 rounded-xl overflow-hidden mb-2 group">
+                <Image 
+                  src={previewUrl} 
+                  alt="Preview" 
+                  fill
+                  className="object-cover" 
+                />
+                <button 
+                  type="button"
+                  onClick={() => { setFile(null); setPreviewUrl(null); }}
+                  className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Plus className="h-4 w-4 rotate-45" />
+                </button>
+              </div>
+            )}
             <Label className="flex items-center gap-2 cursor-pointer border-2 border-dashed border-slate-200 p-4 rounded-xl hover:bg-slate-50 transition-colors">
               <Camera className="h-5 w-5 text-indigo-500" />
               <span className="text-xs text-slate-500 truncate">
                 {file ? file.name : "Prendre/Ajouter une photo"}
               </span>
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+              <input 
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={handleFileChange} 
+              />
             </Label>
           </div>
 

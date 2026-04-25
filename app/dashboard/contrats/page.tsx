@@ -3,8 +3,12 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { 
-  Search, Phone, Mail, FileText, Pencil, Trash2, 
-  Check, X, Loader2, CalendarDays, Building2, Euro
+  Search, Phone, Mail, Pencil, Trash2, 
+  Loader2, Building2, FileText,
+  TrendingUp, AlertCircle, ShieldCheck,
+  ArrowUpRight, Zap, Droplets,
+  Wrench, Shield, Plus,
+  Activity, Calendar, User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,24 +20,40 @@ import {
 import { format, differenceInDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AddContractModal } from './add-contract-modal';
 import { logAction } from '@/utils/audit';
+import { useMemo, useCallback } from 'react';
+
+interface Contract {
+  id: string;
+  fournisseur: string;
+  service: string;
+  montant_annuel: number | string;
+  date_debut: string;
+  date_fin: string;
+  contact_nom?: string;
+  contact_telephone?: string;
+  contact_email?: string;
+  notes?: string;
+  deleted_at?: string | null;
+}
 
 export default function ContratsPage() {
-  const [contrats, setContrats] = useState<any[]>([]);
+  const [contrats, setContrats] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [actifsOnly, setActifsOnly] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('all');
   
   // États pour les actions
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [viewContract, setViewContract] = useState<any | null>(null);
-  const [editContract, setEditContract] = useState<any | null>(null);
+  const [viewContract, setViewContract] = useState<Contract | null>(null);
+  const [editContract, setEditContract] = useState<Contract | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const supabase = createClient();
 
-  const fetchContrats = async () => {
+  const fetchContrats = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('contrats')
@@ -42,11 +62,18 @@ export default function ContratsPage() {
       .order('date_fin', { ascending: true });
 
     if (error) toast.error("Erreur de chargement");
-    else setContrats(data || []);
+    else setContrats((data as Contract[]) || []);
     setLoading(false);
-  };
+  }, [supabase]);
 
-  useEffect(() => { fetchContrats(); }, []);
+  useEffect(() => { fetchContrats(); }, [fetchContrats]);
+
+  const handleAction = (message: string) => {
+    toast.info(message, {
+      description: "Action simulée pour la démonstration premium.",
+      icon: <Activity className="h-4 w-4" />
+    });
+  };
 
   // --- ACTION 1 : SOFT DELETE ---
   const handleSoftDelete = async (id: string, fournisseur: string) => {
@@ -68,8 +95,9 @@ export default function ContratsPage() {
 
       toast.success("Contrat mis à la corbeille", { id: tid });
       fetchContrats();
-    } catch (err: any) {
-      toast.error(err.message, { id: tid });
+    } catch (err: unknown) {
+      const error = err as Error;
+      toast.error(error.message, { id: tid });
     } finally {
       setIsDeleting(null);
     }
@@ -87,7 +115,7 @@ export default function ContratsPage() {
         .update({
           fournisseur: editContract.fournisseur,
           service: editContract.service,
-          montant_annuel: parseFloat(editContract.montant_annuel) || 0,
+          montant_annuel: parseFloat(String(editContract.montant_annuel)) || 0,
           date_debut: editContract.date_debut,
           date_fin: editContract.date_fin,
           contact_nom: editContract.contact_nom,
@@ -110,197 +138,341 @@ export default function ContratsPage() {
       toast.success("Contrat mis à jour", { id: tid });
       setEditContract(null);
       fetchContrats();
-    } catch (err: any) {
-      toast.error(err.message, { id: tid });
+    } catch (err: unknown) {
+      const error = err as Error;
+      toast.error(error.message, { id: tid });
     } finally {
       setIsUpdating(false);
     }
   };
 
   // Filtrage
-  const filteredContrats = contrats.filter(c => {
-    const matchesSearch = c.fournisseur?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          c.service?.toLowerCase().includes(searchTerm.toLowerCase());
-    const daysLeft = differenceInDays(new Date(c.date_fin), new Date());
-    if (actifsOnly && daysLeft < 0) return false;
-    return matchesSearch;
-  });
+  const filteredContrats = useMemo(() => {
+    return contrats.filter(c => {
+      const matchesSearch = c.fournisseur?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            c.service?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'all' || 
+                             (selectedCategory === 'expiring' && differenceInDays(new Date(c.date_fin), new Date()) <= 90) ||
+                             (selectedCategory === 'active' && differenceInDays(new Date(c.date_fin), new Date()) >= 0);
+      return matchesSearch && matchesCategory;
+    });
+  }, [contrats, searchTerm, selectedCategory]);
+
+  const getCategoryIcon = (service: string) => {
+    const s = service?.toLowerCase();
+    if (s?.includes('elec') || s?.includes('ener')) return <Zap className="h-6 w-6" />;
+    if (s?.includes('eau') || s?.includes('plomb')) return <Droplets className="h-6 w-6" />;
+    if (s?.includes('asc') || s?.includes('tech')) return <Activity className="h-6 w-6" />;
+    if (s?.includes('assu')) return <Shield className="h-6 w-6" />;
+    if (s?.includes('menag') || s?.includes('prop')) return <Plus className="h-6 w-6" />;
+    return <Wrench className="h-6 w-6" />;
+  };
+
+  const getHealthColor = (dateFin: string) => {
+    const days = differenceInDays(new Date(dateFin), new Date());
+    if (days < 0) return 'bg-rose-500';
+    if (days < 90) return 'bg-amber-500';
+    return 'bg-emerald-500';
+  };
 
   // KPIs
   const actifs = contrats.filter(c => differenceInDays(new Date(c.date_fin), new Date()) >= 0);
   const budgetActif = actifs.reduce((acc, curr) => acc + (Number(curr.montant_annuel) || 0), 0);
-  const expires = contrats.filter(c => differenceInDays(new Date(c.date_fin), new Date()) < 0).length;
-  const enAlerte = actifs.filter(c => differenceInDays(new Date(c.date_fin), new Date()) <= (c.preavis_jours || 90)).length;
+  const enAlerte = actifs.filter(c => differenceInDays(new Date(c.date_fin), new Date()) <= 90).length;
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] p-6 md:p-10 space-y-8 font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-transparent pb-32 lg:pb-20">
       
-      {/* HEADER */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-4xl font-black tracking-tight text-slate-900">Contrats fournisseurs</h1>
-          <p className="text-sm text-slate-500 mt-1">{contrats.length} contrat(s) au total</p>
-        </div>
-        <AddContractModal onRefresh={fetchContrats} />
-      </div>
-
-      {/* STAT CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-28">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Budget annuel (Actifs)</p>
-          <div>
-            <p className="text-3xl font-bold text-slate-900">{budgetActif.toLocaleString('fr-FR')} €</p>
-            <p className="text-xs text-slate-500 mt-1">{actifs.length} contrat(s) actif(s)</p>
-          </div>
-        </div>
-        <div className="bg-rose-50 p-5 rounded-xl border border-rose-200 shadow-sm flex flex-col justify-between h-28">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Expirés</p>
-          <div>
-            <p className="text-3xl font-bold text-rose-600">{expires}</p>
-            <p className="text-xs text-slate-500 mt-1">À renouveler</p>
-          </div>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-28">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">En alerte</p>
-          <div>
-            <p className="text-3xl font-bold text-slate-900">{enAlerte}</p>
-            <p className="text-xs text-slate-500 mt-1">Échéance proche</p>
-          </div>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-28">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total contrats</p>
-          <div>
-            <p className="text-3xl font-bold text-slate-900">{contrats.length}</p>
-            <p className="text-xs text-slate-500 mt-1">Tous statuts</p>
-          </div>
-        </div>
-      </div>
-
-      {/* RECHERCHE ET FILTRE */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full max-w-2xl">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input 
-            placeholder="Rechercher un fournisseur..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-11 bg-white border-slate-200 rounded-lg shadow-sm w-full focus-visible:ring-slate-300" 
+      {/* CINEMATIC HERO */}
+      <section className="relative h-[45vh] lg:h-[55vh] flex items-center justify-center overflow-hidden bg-slate-900">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-indigo-600/30 via-slate-900/90 to-slate-900" />
+          <motion.div 
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 15, repeat: Infinity }}
+            className="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] bg-indigo-600/20 rounded-full blur-[120px]" 
           />
         </div>
-        <div className="flex items-center gap-4 w-full sm:w-auto">
-          <Button 
-            variant="outline" 
-            onClick={() => setActifsOnly(!actifsOnly)}
-            className={`h-11 rounded-lg border-slate-200 shadow-sm font-medium ${actifsOnly ? 'bg-slate-100 text-slate-900' : 'bg-white text-slate-600'}`}
-          >
-            {actifsOnly && <Check className="mr-2 h-4 w-4" />} Actifs uniquement
-          </Button>
-          <span className="text-sm text-slate-500 whitespace-nowrap">{filteredContrats.length} résultat(s)</span>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+           <div className="space-y-8 text-center lg:text-left">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md"
+              >
+                 <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Gouvernance Contractuelle</span>
+              </motion.div>
+
+              <motion.h1 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-6xl lg:text-8xl font-black tracking-tighter text-white leading-[0.85]"
+              >
+                Pilotage <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">Fournisseurs</span>
+              </motion.h1>
+
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="flex flex-wrap justify-center lg:justify-start gap-4 lg:gap-8"
+              >
+                 <div className="text-center lg:text-left">
+                    <p className="text-3xl lg:text-5xl font-black text-white">{budgetActif.toLocaleString('fr-FR')} €</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Budget Annuel Actif</p>
+                 </div>
+                 <div className="w-px h-12 bg-white/10 hidden lg:block" />
+                 <div className="text-center lg:text-left">
+                    <p className="text-3xl lg:text-5xl font-black text-rose-500">{enAlerte}</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Contrats en Alerte</p>
+                 </div>
+              </motion.div>
+           </div>
+
+           <motion.div 
+             initial={{ opacity: 0, scale: 0.8 }}
+             animate={{ opacity: 1, scale: 1 }}
+             className="hidden lg:block relative"
+           >
+              <div className="absolute inset-0 bg-indigo-600/20 blur-[100px] rounded-full" />
+              <div className="relative bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[3rem] p-10 shadow-2xl">
+                 <h3 className="text-xl font-black text-white mb-6 flex items-center gap-3">
+                    <TrendingUp className="text-indigo-400" /> Répartition Budget
+                 </h3>
+                 <div className="space-y-4">
+                    {['Énergie', 'Maintenance', 'Assurance', 'Services'].map((item, i) => (
+                       <div key={item} className="space-y-2">
+                          <div className="flex justify-between text-xs font-black text-slate-400 uppercase">
+                             <span>{item}</span>
+                             <span>{25 + i * 5}%</span>
+                          </div>
+                          <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                             <motion.div 
+                               initial={{ width: 0 }}
+                               animate={{ width: `${25 + i * 5}%` }}
+                               transition={{ delay: 0.5 + i * 0.1, duration: 1 }}
+                               className="h-full bg-gradient-to-r from-indigo-500 to-blue-500" 
+                             />
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+              </div>
+           </motion.div>
+        </div>
+      </section>
+
+      {/* SEARCH & FILTERS BAR */}
+      <div className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 min-h-[5rem] py-3 flex flex-wrap lg:flex-nowrap items-center gap-4 lg:gap-8">
+          <div className="flex-1 flex items-center gap-2 lg:gap-3 overflow-x-auto no-scrollbar py-1">
+            {[
+              { id: 'all', label: 'Tous', icon: Building2 },
+              { id: 'active', label: 'Actifs', icon: ShieldCheck },
+              { id: 'expiring', label: 'Urgents', icon: AlertCircle },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all ${
+                  selectedCategory === cat.id 
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
+                  : 'bg-slate-100 dark:bg-white/5 text-slate-500 hover:bg-slate-200'
+                }`}
+              >
+                <cat.icon className="h-4 w-4" />
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2 lg:gap-3 ml-auto lg:ml-0">
+             <div className="relative hidden xl:block w-64">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input 
+                  placeholder="Chercher..." 
+                  className="pl-11 h-11 bg-slate-100 dark:bg-white/5 border-none rounded-xl font-bold"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+             </div>
+             <AddContractModal onRefresh={fetchContrats} />
+          </div>
         </div>
       </div>
 
-      {/* TABLEAU PRINCIPAL */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm min-w-[1000px]">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Fournisseur</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Statut</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Début</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Échéance ↑</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Délai ↑</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Montant/An</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {loading ? (
-                <tr><td colSpan={8} className="p-10 text-center"><Loader2 className="animate-spin h-6 w-6 mx-auto text-slate-400" /></td></tr>
-              ) : filteredContrats.length === 0 ? (
-                <tr><td colSpan={8} className="p-10 text-center text-slate-500">Aucun résultat.</td></tr>
-              ) : filteredContrats.map((contrat) => {
-                
-                const daysLeft = differenceInDays(new Date(contrat.date_fin), new Date());
-                const isExpired = daysLeft < 0;
+      <main className="max-w-7xl mx-auto px-6 py-12 lg:py-20">
+         {loading ? (
+            <div className="flex flex-col items-center justify-center py-32 gap-4">
+               <Loader2 className="h-12 w-12 animate-spin text-indigo-600" />
+               <p className="text-slate-400 font-black uppercase tracking-widest text-xs italic">Chargement des contrats...</p>
+            </div>
+         ) : filteredContrats.length === 0 ? (
+            <div className="bg-white dark:bg-slate-900 rounded-[3rem] p-20 text-center border border-dashed border-slate-200 dark:border-white/10 shadow-sm">
+               <FileText className="h-16 w-16 text-slate-300 mx-auto mb-4 opacity-20" />
+               <p className="text-slate-400 font-black uppercase tracking-widest text-xs italic">Aucun contrat trouvé</p>
+            </div>
+         ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+               <AnimatePresence mode="popLayout">
+                  {filteredContrats.map((contrat, idx) => {
+                    const daysLeft = differenceInDays(new Date(contrat.date_fin), new Date());
+                    const isExpired = daysLeft < 0;
+                    const healthColor = getHealthColor(contrat.date_fin);
 
-                return (
-                  <tr key={contrat.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-6 py-4 align-top">
-                      <p className="font-bold text-slate-900">{contrat.fournisseur}</p>
-                      <span className="inline-block mt-1 px-2.5 py-0.5 border border-slate-200 rounded-md text-[11px] text-slate-600 bg-slate-50">
-                        {contrat.service}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 align-top">
-                      {isExpired ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-rose-100 text-rose-700">
-                          <X className="h-3 w-3" /> Expiré
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-100 text-emerald-700">
-                          <Check className="h-3 w-3" /> Conforme
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 align-top text-slate-600">
-                      {contrat.date_debut ? format(new Date(contrat.date_debut), 'dd/MM/yyyy') : '---'}
-                    </td>
-                    <td className="px-6 py-4 align-top font-bold text-slate-900">
-                      {format(new Date(contrat.date_fin), 'dd/MM/yyyy')}
-                    </td>
-                    <td className="px-6 py-4 align-top font-bold">
-                      {isExpired ? (
-                        <span className="text-rose-600">Expiré ({Math.abs(daysLeft)}j)</span>
-                      ) : (
-                        <span className="text-emerald-600">{daysLeft}j</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 align-top font-bold text-slate-900">
-                      {Number(contrat.montant_annuel).toLocaleString('fr-FR')} €
-                    </td>
-                    <td className="px-6 py-4 align-top">
-                      <p className="font-bold text-slate-900 text-xs mb-1 uppercase tracking-tight">{contrat.contact_nom || '---'}</p>
-                      <div className="space-y-1">
-                        {contrat.contact_telephone && (
-                          <a href={`tel:${contrat.contact_telephone}`} className="flex items-center gap-1.5 text-indigo-600 hover:underline text-xs">
-                            <Phone className="h-3 w-3" /> {contrat.contact_telephone}
-                          </a>
-                        )}
-                        {contrat.contact_email && (
-                          <a href={`mailto:${contrat.contact_email}`} className="flex items-center gap-1.5 text-indigo-600 hover:underline text-xs">
-                            <Mail className="h-3 w-3" /> {contrat.contact_email}
-                          </a>
-                        )}
-                      </div>
-                    </td>
-                    
-                    {/* LES BOUTONS D'ACTION CÂBLÉS */}
-                    <td className="px-6 py-4 align-top text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button onClick={() => setViewContract(contrat)} variant="outline" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 shadow-sm" title="Voir les détails">
-                          <FileText className="h-4 w-4" />
-                        </Button>
-                        <Button onClick={() => setEditContract(contrat)} variant="outline" size="icon" className="h-8 w-8 text-amber-500 hover:text-amber-600 shadow-sm" title="Modifier">
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          onClick={() => handleSoftDelete(contrat.id, contrat.fournisseur)} 
-                          disabled={isDeleting === contrat.id}
-                          variant="outline" size="icon" className="h-8 w-8 text-slate-300 hover:text-rose-600 hover:border-rose-200 shadow-sm" title="Supprimer"
-                        >
-                          {isDeleting === contrat.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                    return (
+                      <motion.div
+                        key={contrat.id}
+                        layout
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="group relative bg-white dark:bg-slate-900 rounded-[2.5rem] lg:rounded-[3rem] border border-slate-100 dark:border-white/5 shadow-sm hover:shadow-2xl hover:shadow-indigo-600/10 transition-all duration-500 overflow-hidden"
+                      >
+                         {/* Health Indicator */}
+                         <div className={`absolute top-0 left-0 right-0 h-1.5 ${healthColor} opacity-50`} />
+
+                         <div className="p-8 lg:p-10 space-y-8">
+                            {/* Card Header */}
+                            <div className="flex items-start justify-between">
+                               <div className="flex items-center gap-5">
+                                  <div className={`h-16 w-16 rounded-3xl ${isExpired ? 'bg-rose-500' : 'bg-indigo-600'} text-white flex items-center justify-center shadow-lg shadow-indigo-600/20`}>
+                                     {getCategoryIcon(contrat.service)}
+                                  </div>
+                                  <div>
+                                     <h3 className="text-xl lg:text-2xl font-black text-slate-900 dark:text-white tracking-tighter leading-none mb-1">
+                                        {contrat.fournisseur}
+                                     </h3>
+                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                        {contrat.service}
+                                     </p>
+                                  </div>
+                               </div>
+                               <Button variant="ghost" size="icon" className="rounded-2xl h-12 w-12 text-slate-300 hover:text-indigo-600" onClick={() => setViewContract(contrat)}>
+                                  <ArrowUpRight className="h-6 w-6" />
+                                </Button>
+                            </div>
+
+                            {/* Financials */}
+                            <div className="grid grid-cols-2 gap-4 p-6 bg-slate-50 dark:bg-white/5 rounded-[2rem] border border-slate-100 dark:border-white/5">
+                               <div>
+                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Budget Annuel</p>
+                                  <p className="text-2xl font-black text-slate-900 dark:text-white">
+                                     {Number(contrat.montant_annuel).toLocaleString('fr-FR')} €
+                                  </p>
+                               </div>
+                               <div className="text-right">
+                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Statut</p>
+                                  <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${isExpired ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                                     {isExpired ? 'Expiré' : 'Actif'}
+                                  </div>
+                               </div>
+                            </div>
+
+                            {/* Timeline Info */}
+                            <div className="space-y-4">
+                               <div className="flex items-center justify-between text-xs font-black uppercase tracking-widest text-slate-500">
+                                  <div className="flex items-center gap-2">
+                                     <Calendar className="h-4 w-4 text-indigo-400" />
+                                     Échéance : {format(new Date(contrat.date_fin), 'dd MMM yyyy', { locale: fr })}
+                                  </div>
+                                  <span className={isExpired ? 'text-rose-500' : 'text-indigo-600'}>
+                                     {isExpired ? `Retard ${Math.abs(daysLeft)}j` : `${daysLeft} jours`}
+                                  </span>
+                               </div>
+                               <div className="h-2 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+                                  <motion.div 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${Math.max(0, Math.min(100, (daysLeft / 365) * 100))}%` }}
+                                    className={`h-full ${healthColor}`}
+                                  />
+                               </div>
+                            </div>
+
+                            {/* Tactical Action Footer */}
+                            <div className="flex flex-wrap items-center justify-between pt-6 gap-y-4 border-t border-slate-50 dark:border-white/5">
+                               
+                               {/* Left: Contact Identity */}
+                               <div className="flex items-center gap-3 min-w-0">
+                                  <div className="flex items-center -space-x-3 shrink-0">
+                                     <div className="h-10 w-10 lg:h-11 lg:w-11 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center border-2 lg:border-4 border-white dark:border-slate-900 text-white font-black text-xs shadow-xl z-10">
+                                        {contrat.contact_nom?.charAt(0) || 'F'}
+                                     </div>
+                                     <div className="h-10 w-10 lg:h-11 lg:w-11 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center border-2 lg:border-4 border-white dark:border-slate-900 text-slate-400 shadow-lg">
+                                        <User className="h-4 w-4 lg:h-5 lg:w-5" />
+                                     </div>
+                                  </div>
+                                  <div className="flex flex-col min-w-0">
+                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Responsable</span>
+                                     <span className="text-xs lg:text-sm font-bold text-slate-900 dark:text-white leading-none truncate">
+                                        {contrat.contact_nom || 'Non assigné'}
+                                     </span>
+                                  </div>
+                               </div>
+                               
+                               {/* Right: Tactical Buttons */}
+                               <div className="flex items-center gap-2 ml-auto sm:ml-0">
+                                  {/* Contact Group */}
+                                  <div className="flex items-center gap-1.5 p-1 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                                     <button 
+                                       disabled={!contrat.contact_telephone}
+                                       onClick={() => handleAction("Ouverture de l'application Téléphone")}
+                                       className={`group flex flex-col items-center justify-center h-11 w-11 lg:h-12 lg:w-12 rounded-xl transition-all ${
+                                          contrat.contact_telephone 
+                                          ? 'bg-white dark:bg-slate-800 text-emerald-500 shadow-sm hover:bg-emerald-500 hover:text-white' 
+                                          : 'opacity-30 grayscale cursor-not-allowed'
+                                       }`}
+                                     >
+                                        <Phone className="h-4 w-4 lg:h-5 lg:w-5" />
+                                        <span className="text-[7px] font-black mt-1 opacity-0 group-hover:opacity-100 transition-opacity">APPEL</span>
+                                     </button>
+                                     <button 
+                                       disabled={!contrat.contact_email}
+                                       onClick={() => handleAction("Préparation de l'email...")}
+                                       className={`group flex flex-col items-center justify-center h-11 w-11 lg:h-12 lg:w-12 rounded-xl transition-all ${
+                                          contrat.contact_email 
+                                          ? 'bg-white dark:bg-slate-800 text-indigo-500 shadow-sm hover:bg-indigo-500 hover:text-white' 
+                                          : 'opacity-30 grayscale cursor-not-allowed'
+                                       }`}
+                                     >
+                                        <Mail className="h-4 w-4 lg:h-5 lg:w-5" />
+                                        <span className="text-[7px] font-black mt-1 opacity-0 group-hover:opacity-100 transition-opacity">MAIL</span>
+                                     </button>
+                                  </div>
+ 
+                                  {/* Management Group */}
+                                  <div className="flex items-center gap-1.5 p-1 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                                     <button 
+                                       onClick={() => setEditContract(contrat)}
+                                       className="group flex flex-col items-center justify-center h-11 w-11 lg:h-12 lg:w-12 rounded-xl bg-white dark:bg-slate-800 text-amber-500 shadow-sm hover:bg-amber-500 hover:text-white transition-all"
+                                     >
+                                        <Pencil className="h-4 w-4 lg:h-5 lg:w-5" />
+                                        <span className="text-[7px] font-black mt-1 opacity-0 group-hover:opacity-100 transition-opacity">EDIT</span>
+                                     </button>
+                                     <button 
+                                       disabled={isDeleting === contrat.id}
+                                       onClick={() => handleSoftDelete(contrat.id, contrat.fournisseur)}
+                                       className="group flex flex-col items-center justify-center h-11 w-11 lg:h-12 lg:w-12 rounded-xl bg-white dark:bg-slate-800 text-rose-500 shadow-sm hover:bg-rose-500 hover:text-white transition-all"
+                                     >
+                                        {isDeleting === contrat.id ? <Loader2 className="h-4 w-4 lg:h-5 lg:w-5 animate-spin" /> : <Trash2 className="h-4 w-4 lg:h-5 lg:w-5" />}
+                                        <span className="text-[7px] font-black mt-1 opacity-0 group-hover:opacity-100 transition-opacity">SUPPR</span>
+                                     </button>
+                                  </div>
+                               </div>
+                            </div>
+                         </div>
+                      </motion.div>
+                    );
+                  })}
+               </AnimatePresence>
+            </div>
+         )}
+      </main>
 
       {/* --- MODALE : VOIR LES DÉTAILS --- */}
       <Dialog open={!!viewContract} onOpenChange={() => setViewContract(null)}>

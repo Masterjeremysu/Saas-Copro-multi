@@ -70,8 +70,9 @@ export function AddAgModal() {
       // Redirection immédiate vers la page de l'AG pour ajouter l'ordre du jour
       router.push(`/dashboard/ag/${nouvelleAg.id}`);
 
-    } catch (err: any) {
-      toast.error(err.message, { id: tid });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Une erreur est survenue";
+      toast.error(message, { id: tid });
       setLoading(false);
     }
   };
@@ -98,7 +99,7 @@ export function AddAgModal() {
 
         <div className="space-y-6 pt-8">
           <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Titre de l'assemblée *</Label>
+            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Titre de l&apos;assemblée *</Label>
             <Input 
               value={titre} onChange={e => setTitre(e.target.value)}
               placeholder="Ex: Assemblée Ordinaire 2024"
