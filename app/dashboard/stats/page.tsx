@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { 
-  BarChart3, 
   TrendingUp, 
   AlertCircle, 
   CheckCircle2, 

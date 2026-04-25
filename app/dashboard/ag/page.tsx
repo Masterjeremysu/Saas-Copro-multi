@@ -185,7 +185,6 @@ export default function AssembleesPage() {
   );
 }
 
-interface StatCardProps {
 interface FilterButtonProps {
   active: boolean;
   label: string;

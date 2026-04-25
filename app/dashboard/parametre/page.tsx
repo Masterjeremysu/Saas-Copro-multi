@@ -372,12 +372,18 @@ export default function ParametrePage() {
 
             </div>
           </div>
-
+        </div>
       </div>
-  );
+    );
 }
 
-function ToggleItem({ icon: Icon, label, description, checked, onChange }: { icon: React.ComponentType<{ className?: string }>, label: string, description: string, checked: boolean, onChange: (val: boolean) => void }) {
+function ToggleItem({ icon: Icon, label, description, checked, onChange }: { 
+  icon: React.ComponentType<{ className?: string }>, 
+  label: string, 
+  description: string, 
+  checked: boolean, 
+  onChange: (val: boolean) => void 
+}) {
   return (
     <div className="flex items-center justify-between p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
       <div className="flex items-center gap-4">
