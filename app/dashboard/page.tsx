@@ -327,7 +327,7 @@ export default function OverviewPage() {
               {isArtisan ? `Expert ${data?.profile?.specialite || 'Partenaire'}` : `Cockpit ${data?.profile?.role === 'syndic' ? 'Syndic' : 'Résident'}`}
             </Badge>
             
-            <h1 className="text-3xl lg:text-7xl font-black tracking-tighter leading-none">
+            <h1 className="text-3xl lg:text-7xl font-black tracking-tighter leading-none italic pr-10">
               {isArtisan ? (
                 data?.stats.activeInterventions === 0 && (data?.stats.quotesToDraft || 0) > 0 ? (
                   <>De nouvelles <br className="hidden lg:block" /> opportunités ?</>

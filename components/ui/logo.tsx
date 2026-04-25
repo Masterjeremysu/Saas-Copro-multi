@@ -49,7 +49,7 @@ export function Logo({ className = "", withText = true, variant = 'dark' }: Logo
       </div>
 
       {withText && (
-        <span className={`text-2xl font-black tracking-tighter uppercase italic transition-colors duration-300 ${
+        <span className={`text-2xl font-black tracking-tighter uppercase italic pr-2 transition-colors duration-300 ${
           isWhite ? 'text-white' : isLight ? 'text-slate-200' : 'text-slate-900 dark:text-white'
         }`}>
           Copro<span className="text-indigo-600">Sync</span>

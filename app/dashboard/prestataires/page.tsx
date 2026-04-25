@@ -124,7 +124,7 @@ export default function PrestatairesPage() {
                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Réseau Certifié Live</span>
             </div>
             
-            <h1 className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic pr-4">
+            <h1 className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic pr-10">
                Annuaire <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Technique</span>
             </h1>
             
