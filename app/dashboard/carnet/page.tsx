@@ -3,29 +3,19 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   HistoryIcon, 
   Plus, 
-  Wrench, 
-  CheckCircle2, 
-  AlertTriangle,
   Search,
   FileText,
   Loader2,
   HardHat,
-  ArrowLeft,
   Activity,
   Calendar,
-  Zap,
-  Droplets,
   Flame,
-  ShieldCheck,
-  Smartphone,
   TrendingUp,
   Box,
-  ChevronRight,
-  Clock,
   ArrowUpRight,
   ShieldAlert,
   Construction
@@ -178,8 +168,8 @@ export default function CarnetPage() {
       toast.success("Intervention consignée dans le Ledger Tactical !");
       setIsDialogOpen(false);
       loadCarnet();
-    } catch (err: any) {
-      toast.error("Erreur tactique : " + err.message);
+    } catch (err) {
+      toast.error("Erreur tactique : " + (err as Error).message);
     } finally {
       setIsSaving(false);
     }
