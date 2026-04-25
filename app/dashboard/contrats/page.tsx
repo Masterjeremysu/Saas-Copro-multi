@@ -181,72 +181,66 @@ export default function ContratsPage() {
   const enAlerte = actifs.filter(c => differenceInDays(new Date(c.date_fin), new Date()) <= 90).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-transparent pb-32 lg:pb-20">
+    <div className="p-4 lg:p-10 space-y-10 max-w-[1600px] mx-auto animate-in fade-in duration-700 pb-32">
       
-      {/* CINEMATIC HERO */}
-      <section className="relative h-[45vh] lg:h-[55vh] flex items-center justify-center overflow-hidden bg-slate-900">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-indigo-600/30 via-slate-900/90 to-slate-900" />
-          <motion.div 
-            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-            transition={{ duration: 15, repeat: Infinity }}
-            className="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] bg-indigo-600/20 rounded-full blur-[120px]" 
-          />
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* TACTICAL HERO - MISSION CONTROL STYLE */}
+      <div className="bg-[#0F172A] rounded-[2.5rem] lg:rounded-[4rem] p-8 lg:p-16 text-white relative overflow-hidden shadow-2xl">
+        {/* Animated Background Orbs */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] -mr-64 -mt-64"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] -ml-32 -mb-32"></div>
+        
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
            <div className="space-y-8 text-center lg:text-left">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md"
+                className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10"
               >
                  <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Gouvernance Contractuelle</span>
+                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Gouvernance Contractuelle</span>
               </motion.div>
 
               <motion.h1 
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-6xl lg:text-8xl font-black tracking-tighter text-white leading-[0.85]"
+                className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic"
               >
                 Pilotage <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">Fournisseurs</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Fournisseurs</span>
               </motion.h1>
 
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="flex flex-wrap justify-center lg:justify-start gap-4 lg:gap-8"
+                className="flex flex-wrap justify-center lg:justify-start gap-4 lg:gap-10"
               >
                  <div className="text-center lg:text-left">
                     <p className="text-3xl lg:text-5xl font-black text-white">{budgetActif.toLocaleString('fr-FR')} €</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Budget Annuel Actif</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Budget Annuel Actif</p>
                  </div>
                  <div className="w-px h-12 bg-white/10 hidden lg:block" />
                  <div className="text-center lg:text-left">
                     <p className="text-3xl lg:text-5xl font-black text-rose-500">{enAlerte}</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Contrats en Alerte</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Contrats en Alerte</p>
                  </div>
               </motion.div>
            </div>
 
            <motion.div 
-             initial={{ opacity: 0, scale: 0.8 }}
+             initial={{ opacity: 0, scale: 0.9 }}
              animate={{ opacity: 1, scale: 1 }}
              className="hidden lg:block relative"
            >
-              <div className="absolute inset-0 bg-indigo-600/20 blur-[100px] rounded-full" />
               <div className="relative bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[3rem] p-10 shadow-2xl">
-                 <h3 className="text-xl font-black text-white mb-6 flex items-center gap-3">
-                    <TrendingUp className="text-indigo-400" /> Répartition Budget
+                 <h3 className="text-xl font-black text-white mb-6 flex items-center gap-3 italic">
+                    <TrendingUp className="text-indigo-400 h-6 w-6" /> Répartition Budget
                  </h3>
-                 <div className="space-y-4">
+                 <div className="space-y-5">
                     {['Énergie', 'Maintenance', 'Assurance', 'Services'].map((item, i) => (
                        <div key={item} className="space-y-2">
-                          <div className="flex justify-between text-xs font-black text-slate-400 uppercase">
+                          <div className="flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest">
                              <span>{item}</span>
                              <span>{25 + i * 5}%</span>
                           </div>
@@ -255,7 +249,7 @@ export default function ContratsPage() {
                                initial={{ width: 0 }}
                                animate={{ width: `${25 + i * 5}%` }}
                                transition={{ delay: 0.5 + i * 0.1, duration: 1 }}
-                               className="h-full bg-gradient-to-r from-indigo-500 to-blue-500" 
+                               className="h-full bg-gradient-to-r from-indigo-500 to-blue-400" 
                              />
                           </div>
                        </div>
@@ -264,7 +258,7 @@ export default function ContratsPage() {
               </div>
            </motion.div>
         </div>
-      </section>
+      </div>
 
       {/* SEARCH & FILTERS BAR */}
       <div className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 shadow-sm">

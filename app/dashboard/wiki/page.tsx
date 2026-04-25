@@ -100,29 +100,39 @@ export default function WikiPage() {
   });
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-transparent">
+    <div className="p-4 lg:p-10 space-y-10 max-w-[1600px] mx-auto animate-in fade-in duration-700 pb-32">
       
-      {/* HERO SECTION - CINEMATIC SEARCH */}
-      <div className="relative overflow-hidden bg-[#020617] pt-20 pb-32 px-6 lg:px-10 rounded-b-[3.5rem] lg:rounded-b-[5rem] shadow-2xl">
-        {/* Animated Background Elements */}
-        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px]"></div>
+      {/* TACTICAL HERO - MISSION CONTROL STYLE */}
+      <div className="bg-[#0F172A] rounded-[2.5rem] lg:rounded-[4rem] p-8 lg:p-16 text-white relative overflow-hidden shadow-2xl">
+        {/* Animated Background Orbs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] -ml-32 -mb-32"></div>
         
         <div className="relative z-10 max-w-5xl mx-auto text-center space-y-10">
-          <div className="space-y-4">
+          <div className="space-y-6">
             <motion.div 
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 bg-indigo-500/10 backdrop-blur-md border border-indigo-500/20 text-indigo-300 px-5 py-2 rounded-full font-black uppercase tracking-widest text-[10px]"
+              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/10 text-indigo-300 px-5 py-2 rounded-full font-black uppercase tracking-widest text-[10px]"
             >
               <BookOpen className="h-3 w-3" /> Base de Connaissances CoproSync
             </motion.div>
-            <h1 className="text-5xl lg:text-8xl font-black tracking-tighter text-white leading-none">
-              Wiki <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">Résidence</span>
-            </h1>
-            <p className="text-slate-400 text-lg lg:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
+            <motion.h1 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic"
+            >
+              Wiki <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Résidence</span>
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-slate-400 font-medium text-sm lg:text-xl max-w-2xl mx-auto leading-relaxed"
+            >
               Toutes les clés pour maîtriser votre quotidien. Sécurité, règlement, vie pratique : votre savoir partagé.
-            </p>
+            </motion.p>
           </div>
 
           <div className="relative group max-w-3xl mx-auto">
@@ -136,17 +146,12 @@ export default function WikiPage() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                 <kbd className="hidden lg:flex h-8 items-center gap-1 rounded border border-white/10 bg-white/5 px-2 font-mono text-[10px] font-medium text-slate-500">
-                    <span className="text-xs">⌘</span>K
-                 </kbd>
-              </div>
             </div>
           </div>
 
           <div className="flex flex-wrap justify-center gap-2 lg:gap-4 max-w-2xl mx-auto">
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 py-2 mr-2">Top Recherches :</span>
-            {['Code poubelles', 'Badge local vélos', 'Règlement intérieur', 'Coupure eau'].map(tag => (
+            {['Code poubelles', 'Badge local vélos', 'Règlement intérieur'].map(tag => (
               <button 
                 key={tag}
                 onClick={() => setSearchTerm(tag)}

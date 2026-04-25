@@ -89,61 +89,58 @@ export default function AnnoncesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-transparent pb-32 lg:pb-20">
+    <div className="p-4 lg:p-10 space-y-10 max-w-[1600px] mx-auto animate-in fade-in duration-700 pb-32">
       
-      {/* CINEMATIC HERO */}
-      <section className="relative h-[40vh] lg:h-[50vh] flex items-center justify-center overflow-hidden bg-slate-900">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-indigo-600/20 via-slate-900/80 to-slate-900" />
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3],
-              rotate: [0, 90, 0]
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/20 rounded-full blur-[120px]" 
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1.2, 1, 1.2],
-              opacity: [0.2, 0.4, 0.2],
-              rotate: [90, 0, 90]
-            }}
-            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-            className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-rose-600/10 rounded-full blur-[120px]" 
-          />
+      {/* TACTICAL HERO - MISSION CONTROL STYLE */}
+      <div className="bg-[#0F172A] rounded-[2.5rem] lg:rounded-[4rem] p-8 lg:p-16 text-white relative overflow-hidden shadow-2xl">
+        {/* Animated Background Orbs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] -ml-32 -mb-32"></div>
+        
+        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+          <div className="space-y-6 text-center lg:text-left flex-1">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10"
+            >
+               <div className="h-2 w-2 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_#818cf8]"></div>
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Direct Copropriété</span>
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic"
+            >
+               Mur <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Officiel</span>
+            </motion.h1>
+            
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-slate-400 font-medium text-sm lg:text-xl max-w-xl leading-relaxed mx-auto lg:mx-0"
+            >
+               Restez informé en temps réel des communications vitales, travaux et événements de votre résidence.
+            </motion.p>
+          </div>
+          
+          <div className="hidden lg:flex items-center gap-4">
+             <div className="h-32 w-32 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl flex flex-col items-center justify-center text-center">
+                <Bell className="h-8 w-8 text-indigo-400 mb-2" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Alertes</p>
+                <p className="text-xl font-black">{annonces.filter(a => a.prioritaire).length}</p>
+             </div>
+             <div className="h-32 w-32 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl flex flex-col items-center justify-center text-center">
+                <Megaphone className="h-8 w-8 text-blue-400 mb-2" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total</p>
+                <p className="text-xl font-black">{annonces.length}</p>
+             </div>
+          </div>
         </div>
-
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center space-y-8">
-           <motion.div
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl"
-           >
-              <TrendingUp className="h-4 w-4 text-indigo-400" />
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-100">Direct Copropriété</span>
-           </motion.div>
-
-           <motion.h1 
-             initial={{ opacity: 0, y: 30 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ delay: 0.1 }}
-             className="text-6xl lg:text-9xl font-black tracking-tighter text-white leading-[0.85]"
-           >
-             Mur <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">Officiel</span>
-           </motion.h1>
-
-           <motion.p 
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             transition={{ delay: 0.2 }}
-             className="max-w-2xl mx-auto text-slate-400 font-medium text-lg lg:text-xl leading-relaxed"
-           >
-             Restez informé en temps réel des communications vitales, travaux et événements de votre résidence.
-           </motion.p>
-        </div>
-      </section>
+      </div>
 
       {/* FILTER BAR STICKY */}
       <div className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 shadow-sm">

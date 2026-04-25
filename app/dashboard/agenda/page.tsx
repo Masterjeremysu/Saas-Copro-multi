@@ -235,23 +235,70 @@ export default function AgendaPage() {
         <ArrowLeft className="h-4 w-4" /> Retour
       </Link>
 
-      {/* HEADER TACTIQUE */}
-      <div className="flex flex-col lg:flex-row justify-between items-center gap-8 bg-white dark:bg-slate-900 p-8 lg:p-12 rounded-[3rem] border border-slate-100 dark:border-white/5 shadow-sm">
-        <div className="space-y-4 text-center lg:text-left">
-          <div className="flex items-center justify-center lg:justify-start gap-4">
-            <div className="h-14 w-14 bg-indigo-600 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
-              <CalendarIcon className="h-7 w-7" />
-            </div>
-            <div>
-              <h1 className="text-3xl lg:text-5xl font-black tracking-tighter text-slate-900 dark:text-white italic">
-                 Agenda Résidentiel
-              </h1>
-              <p className="text-slate-500 font-medium text-xs lg:text-sm uppercase tracking-widest mt-1">
+      {/* TACTICAL HERO - MISSION CONTROL STYLE */}
+      <div className="bg-[#0F172A] rounded-[2.5rem] lg:rounded-[4rem] p-8 lg:p-16 text-white relative overflow-hidden shadow-2xl">
+        {/* Animated Background Orbs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -ml-32 -mb-32"></div>
+        
+        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+          <div className="space-y-6 text-center lg:text-left flex-1">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10"
+            >
+               <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></div>
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Planning Master</span>
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-4xl lg:text-8xl font-black tracking-tighter leading-none italic"
+            >
+               Agenda <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">Résidentiel</span>
+            </motion.h1>
+            
+            <p className="text-slate-400 font-medium text-sm lg:text-xl max-w-xl leading-relaxed mx-auto lg:mx-0">
+               Visualisez les interventions, réunions et événements de votre copropriété.
+               <span className="block mt-2 text-indigo-400 font-black uppercase tracking-widest text-xs">
                  {format(currentDate, 'MMMM yyyy', { locale: fr })}
-              </p>
-            </div>
+               </span>
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+             <Button 
+                onClick={handleExportAgenda}
+                variant="outline" 
+                className="h-16 px-8 border-white/10 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2"
+              >
+                <FileText className="h-5 w-5 text-indigo-400" /> EXPORT PDF
+              </Button>
+
+              <div className="flex bg-white/5 backdrop-blur-xl p-2 rounded-[1.5rem] border border-white/10">
+                 <Button variant="ghost" size="icon" onClick={() => setCurrentDate(subMonths(currentDate, 1))} className="h-12 w-12 rounded-xl hover:bg-white/10 text-white">
+                    <ChevronLeft className="h-6 w-6" />
+                 </Button>
+                 <Button variant="ghost" onClick={() => setCurrentDate(new Date())} className="px-6 font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-white/10 text-white">
+                    Aujourd&apos;hui
+                 </Button>
+                 <Button variant="ghost" size="icon" onClick={() => setCurrentDate(addMonths(currentDate, 1))} className="h-12 w-12 rounded-xl hover:bg-white/10 text-white">
+                    <ChevronRight className="h-6 w-6" />
+                 </Button>
+              </div>
+
+              <HasRole roles={['administrateur', 'syndic', 'membre_cs']}>
+                <Button onClick={() => setIsDialogOpen(true)} className="h-16 lg:h-20 px-8 lg:px-10 bg-white text-slate-900 hover:bg-indigo-50 rounded-[1.5rem] lg:rounded-[2rem] font-black text-sm lg:text-lg shadow-xl group">
+                  <Plus className="mr-2 h-5 w-5 lg:h-6 lg:w-6 group-hover:rotate-90 transition-transform duration-500" />
+                  AJOUTER
+                </Button>
+              </HasRole>
           </div>
         </div>
+      </div>
 
         <div className="flex items-center gap-4">
           <Button 
