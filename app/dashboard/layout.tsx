@@ -22,13 +22,15 @@ import {
   FileText,
   ClipboardList,
   Building2,
-  ScrollText
+  ScrollText,
+  ArrowUpRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NotificationBell } from './notification-bell';
 import { Logo } from '@/components/ui/logo';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 const NAVIGATION: { group: string, roles?: string[], items: { name: string, href: string, icon: React.ComponentType<{className?: string}>, roles?: string[] }[] }[] = [
   { group: "PRINCIPAL", items: [
@@ -75,9 +77,23 @@ export default function DashboardLayout({
   const [userInitials, setUserInitials] = useState('');
   const [userRole, setUserRole] = useState('');
   const [userName, setUserName] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
+
+  // --- CMD + K SHORTCUT ---
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setIsSearchOpen((open) => !open);
+      }
+    };
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -218,19 +234,70 @@ export default function DashboardLayout({
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
               )}
             </button>
-            <div className="hidden lg:flex items-center bg-slate-100/50 dark:bg-white/5 px-4 h-12 rounded-2xl border border-slate-200/50 dark:border-white/10 w-[400px] group focus-within:w-[500px] focus-within:border-indigo-500/50 focus-within:bg-white dark:focus-within:bg-slate-900 transition-all duration-500 shadow-sm">
-              <Search className="h-4 w-4 text-slate-400 mr-3 group-focus-within:text-indigo-500 transition-colors" />
-              <input 
-                type="text" 
-                placeholder="Rechercher un document, un ticket, un voisin..." 
-                className="bg-transparent border-none text-sm outline-none w-full font-bold placeholder:font-medium placeholder:text-slate-400"
-              />
+            <div 
+              onClick={() => setIsSearchOpen(true)}
+              className="hidden lg:flex items-center bg-slate-100/50 dark:bg-white/5 px-4 h-12 rounded-2xl border border-slate-200/50 dark:border-white/10 w-[400px] group hover:border-indigo-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all duration-500 shadow-sm cursor-pointer"
+            >
+              <Search className="h-4 w-4 text-slate-400 mr-3 group-hover:text-indigo-500 transition-colors" />
+              <span className="text-sm font-bold text-slate-400 flex-1">Rechercher un document, un ticket...</span>
+              <kbd className="hidden sm:inline-flex h-6 select-none items-center gap-1 rounded border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/10 px-2 font-mono text-[10px] font-medium text-slate-500">
+                <span className="text-xs">⌘</span>K
+              </kbd>
             </div>
             {/* Logo mobile visible au scroll */}
             <div className={`lg:hidden transition-all duration-500 ${scrolled ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
               <Logo withText={false} className="scale-75" />
             </div>
           </div>
+
+          {/* COMMAND PALETTE DIALOG */}
+          <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+            <DialogContent className="sm:max-w-[600px] p-0 border-none shadow-2xl bg-white dark:bg-slate-950 overflow-hidden rounded-[2.5rem]">
+              <div className="p-6 border-b border-slate-100 dark:border-white/5 flex items-center gap-4">
+                <Search className="h-6 w-6 text-indigo-600" />
+                <input 
+                  autoFocus
+                  placeholder="Que cherchez-vous ?" 
+                  className="flex-1 bg-transparent border-none text-lg font-bold outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
+                  onChange={(e) => {
+                    const term = e.target.value.toLowerCase();
+                    setSearchTerm(term);
+                  }}
+                />
+                <kbd className="hidden sm:inline-flex h-6 select-none items-center gap-1 rounded border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/10 px-2 font-mono text-[10px] font-medium text-slate-500">
+                  ESC
+                </kbd>
+              </div>
+              <div className="max-h-[400px] overflow-y-auto p-4 custom-scrollbar">
+                <div className="space-y-6">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-4 mb-3">Navigation Rapide</p>
+                    <div className="space-y-1">
+                      {NAVIGATION.flatMap(g => g.items)
+                        .filter(item => !searchTerm || item.name.toLowerCase().includes(searchTerm))
+                        .slice(0, 8)
+                        .map((item) => (
+                          <button
+                            key={item.href}
+                            onClick={() => {
+                              router.push(item.href);
+                              setIsSearchOpen(false);
+                            }}
+                            className="w-full flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-indigo-50 dark:hover:bg-indigo-500/10 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all group text-left"
+                          >
+                            <div className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center group-hover:bg-white dark:group-hover:bg-indigo-500/20 group-hover:shadow-sm transition-all">
+                              <item.icon className="h-5 w-5" />
+                            </div>
+                            <span className="font-bold text-sm">{item.name}</span>
+                            <ArrowUpRight className="ml-auto h-4 w-4 opacity-0 group-hover:opacity-100 transition-all" />
+                          </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           <div className="flex items-center gap-3 lg:gap-6">
             {/* Notification Bell avec Realtime */}
