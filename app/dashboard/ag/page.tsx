@@ -4,10 +4,11 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { 
-  Search, Users, CalendarDays, FileText, 
+  Search, Users, FileText, 
   CheckCircle2, Clock, MapPin, Loader2, PlayCircle,
   ChevronRight
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -49,7 +50,10 @@ export default function AssembleesPage() {
   }, [supabase]);
 
   useEffect(() => { 
-    fetchAGs(); 
+    const initFetch = async () => {
+      await fetchAGs();
+    };
+    initFetch();
   }, [fetchAGs]);
 
   const filteredAGs = assemblees.filter(ag => {
@@ -182,32 +186,6 @@ export default function AssembleesPage() {
 }
 
 interface StatCardProps {
-  label: string;
-  value: string | number;
-  icon: React.ComponentType<{ className?: string }>;
-  color: 'indigo' | 'emerald' | 'blue' | 'amber';
-}
-
-function StatCard({ label, value, icon: Icon, color }: StatCardProps) {
-  const colors = {
-    indigo: 'text-indigo-400 bg-indigo-500/10',
-    emerald: 'text-emerald-400 bg-emerald-500/10',
-    blue: 'text-blue-400 bg-blue-500/10',
-    amber: 'text-amber-400 bg-amber-500/10',
-  };
-  return (
-    <div className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/5 space-y-2">
-      <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${colors[color as keyof typeof colors]}`}>
-        <Icon className="h-5 w-5" />
-      </div>
-      <div>
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</p>
-        <p className="text-2xl font-black text-white">{value}</p>
-      </div>
-    </div>
-  );
-}
-
 interface FilterButtonProps {
   active: boolean;
   label: string;

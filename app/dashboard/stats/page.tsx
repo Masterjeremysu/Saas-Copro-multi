@@ -199,7 +199,7 @@ export default function StatsPage() {
           </CardContent>
         </Card>
       </div>
-      </motion.div>
+      </div>
   );
 }
 
