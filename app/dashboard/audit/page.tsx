@@ -1,41 +1,60 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { 
-  ShieldCheck, Activity, Search, Loader2, 
-  Calendar, Database, ShieldAlert, FileUp, Download, Eye, RotateCcw
+  Activity, Search, Loader2, 
+  ShieldAlert, FileUp, Download, Eye, RotateCcw
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { logAction } from '@/utils/audit';
 
+interface AuditLog {
+  id: string;
+  action: string;
+  resource_type: string;
+  resource_id: string | null;
+  details: string;
+  severity: 'info' | 'warning' | 'critical';
+  created_at: string;
+  metadata?: {
+    filename?: string;
+    [key: string]: unknown;
+  };
+  profiles: {
+    prenom: string;
+    nom: string;
+    role: string;
+  } | null;
+}
+
 export default function AuditLogPage() {
-  const [logs, setLogs] = useState<any[]>([]);
+  const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedLog, setSelectedLog] = useState<any>(null);
+  const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
   const supabase = createClient();
 
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase
       .from('audit_logs')
       .select('*, profiles(prenom, nom, role)')
       .order('created_at', { ascending: false });
-    if (data) setLogs(data);
+    if (data) setLogs(data as AuditLog[]);
     setLoading(false);
-  };
+  }, [supabase]);
 
-  useEffect(() => { fetchLogs(); }, []);
+  useEffect(() => { 
+    fetchLogs(); 
+  }, [fetchLogs]);
 
-  const handleRestore = async (log: any) => {
+  const handleRestore = async (log: AuditLog) => {
     if (log.resource_type !== 'documents' || !log.resource_id) return;
 
     const tid = toast.loading("Restauration de l'actif numérique...");
@@ -57,7 +76,8 @@ export default function AuditLogPage() {
 
       toast.success("Élément réintégré avec succès", { id: tid });
       fetchLogs();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      console.error(err);
       toast.error("Échec de la restauration", { id: tid });
     }
   };
@@ -195,7 +215,7 @@ export default function AuditLogPage() {
         <DialogContent className="sm:max-w-[700px] rounded-[3.5rem] bg-white border-none shadow-2xl p-12">
           <DialogHeader>
             <DialogTitle className="text-3xl font-black tracking-tighter text-slate-900">Expertise Technique</DialogTitle>
-            <DialogDescription>Détails du payload JSON de l'événement.</DialogDescription>
+            <DialogDescription>Détails du payload JSON de l&apos;événement.</DialogDescription>
           </DialogHeader>
           <div className="space-y-10 pt-8">
              <pre className="p-10 bg-slate-900 text-indigo-300 rounded-[2.5rem] text-sm font-mono overflow-auto max-h-[500px] border border-slate-800 leading-relaxed scrollbar-hide">
@@ -208,7 +228,7 @@ export default function AuditLogPage() {
   );
 }
 
-function StatCard({ title, value, icon, color = "text-slate-900" }: any) {
+function StatCard({ title, value, icon, color = "text-slate-900" }: { title: string; value: string | number; icon: React.ReactNode; color?: string }) {
   return (
     <Card className="p-12 border-none shadow-[0_25px_60px_-15px_rgba(0,0,0,0.05)] bg-white rounded-[3rem] flex items-center justify-between group hover:translate-y-[-8px] transition-all duration-700">
       <div className="flex flex-col justify-center min-w-0">
