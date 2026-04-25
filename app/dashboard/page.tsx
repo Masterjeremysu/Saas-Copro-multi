@@ -444,14 +444,14 @@ export default function OverviewPage() {
             <h3 className="text-xl lg:text-2xl font-black tracking-tighter text-slate-900 dark:text-white flex items-center gap-2">
               <MessageSquare className="h-5 w-5 lg:h-6 lg:w-6 text-indigo-600" /> Flux d&apos;activité
             </h3>
-            <Link href="/dashboard/activite">
+            <Link href="/dashboard/tickets">
               <Button variant="ghost" className="text-[10px] lg:text-xs font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600">Tout voir</Button>
             </Link>
           </div>
           
-          <div className="relative pl-4 lg:pl-8 space-y-6 lg:space-y-8">
-            {/* Timeline Line */}
-            <div className="absolute left-[11px] lg:left-[23px] top-4 bottom-4 w-[2px] bg-gradient-to-b from-indigo-500/50 via-slate-200 dark:via-slate-800 to-transparent"></div>
+          <div className="relative pl-4 lg:pl-10 space-y-6 lg:space-y-8">
+            {/* Timeline Line - Simplified for stability */}
+            <div className="absolute left-[11px] lg:left-[23px] top-4 bottom-4 w-[2px] bg-slate-200 dark:bg-slate-800"></div>
 
             {data?.recentActivity.length === 0 ? (
               <div className="bg-white dark:bg-slate-900/50 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 text-center italic text-slate-400 text-sm">
@@ -577,9 +577,9 @@ function ActivityItem({ act, index }: { act: TicketComment; index: number }) {
         <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
       </div>
 
-      <div className="flex-1 bg-white/60 dark:bg-slate-900/40 backdrop-blur-md p-5 lg:p-6 rounded-[1.5rem] lg:rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm group-hover:shadow-xl group-hover:border-indigo-200/50 dark:group-hover:border-indigo-500/30 transition-all duration-500">
+      <div className="flex-1 bg-white dark:bg-slate-900 p-5 lg:p-6 rounded-[1.5rem] lg:rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300">
         <div className="flex gap-4 lg:gap-5 items-start">
-          <div className={`h-10 w-10 lg:h-12 lg:w-12 rounded-xl lg:rounded-2xl flex items-center justify-center shrink-0 shadow-inner ${
+          <div className={`h-10 w-10 lg:h-12 lg:w-12 rounded-xl lg:rounded-2xl flex items-center justify-center shrink-0 ${
             act.auteur.role === 'artisan' 
               ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10' 
               : 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10'
@@ -592,21 +592,21 @@ function ActivityItem({ act, index }: { act: TicketComment; index: number }) {
               <p className="text-xs lg:text-sm font-black text-slate-900 dark:text-white flex flex-wrap items-center gap-x-1.5">
                 <span className="text-indigo-600 dark:text-indigo-400">{act.auteur.prenom} {act.auteur.nom}</span>
                 <span className="text-slate-400 font-bold uppercase text-[9px] tracking-widest">sur</span>
-                <span className="truncate max-w-[200px]">{act.ticket.titre}</span>
+                <span className="truncate max-w-[200px]">{act.ticket?.titre || 'Ticket'}</span>
               </p>
               <span className="text-[8px] lg:text-[9px] text-slate-400 font-black uppercase tracking-tighter bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full self-start sm:self-auto">
                 {new Date(act.created_at).toLocaleDateString('fr-FR')}
               </span>
             </div>
 
-            <div className="bg-slate-50/50 dark:bg-slate-800/30 p-3 lg:p-4 rounded-xl lg:rounded-2xl border border-slate-100/50 dark:border-slate-700/30">
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-3 lg:p-4 rounded-xl lg:rounded-2xl border border-slate-100 dark:border-slate-800">
               <p className="text-xs lg:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
-                {formatActivityMessage(act.message)}
+                {formatActivityMessage(act.message || "")}
               </p>
             </div>
 
             <div className="flex justify-end">
-              <Link href={`/dashboard/tickets/${act.ticket.id}`} className="group/link flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
+              <Link href={`/dashboard/tickets/${act.ticket?.id}`} className="group/link flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
                 <span className="text-[9px] lg:text-[10px] font-black uppercase text-indigo-600 tracking-widest">Voir le dossier</span>
                 <ArrowRight className="h-3 w-3 text-indigo-600 group-hover/link:translate-x-1 transition-transform" />
               </Link>
