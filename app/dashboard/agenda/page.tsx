@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { createClient } from '@/utils/supabase/client';
 import { 
   Calendar as CalendarIcon, 
@@ -291,115 +292,85 @@ export default function AgendaPage() {
               </div>
 
               <HasRole roles={['administrateur', 'syndic', 'membre_cs']}>
-                <Button onClick={() => setIsDialogOpen(true)} className="h-16 lg:h-20 px-8 lg:px-10 bg-white text-slate-900 hover:bg-indigo-50 rounded-[1.5rem] lg:rounded-[2rem] font-black text-sm lg:text-lg shadow-xl group">
-                  <Plus className="mr-2 h-5 w-5 lg:h-6 lg:w-6 group-hover:rotate-90 transition-transform duration-500" />
-                  AJOUTER
-                </Button>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="h-16 lg:h-20 px-8 lg:px-10 bg-white text-slate-900 hover:bg-indigo-50 rounded-[1.5rem] lg:rounded-[2rem] font-black text-sm lg:text-lg shadow-xl group">
+                      <Plus className="mr-2 h-5 w-5 lg:h-6 lg:w-6 group-hover:rotate-90 transition-transform duration-500" />
+                      AJOUTER
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="rounded-[2.5rem] border-none shadow-2xl p-8 bg-white dark:bg-slate-900 max-w-lg">
+                    <DialogTitle className="text-3xl font-black tracking-tighter mb-2">Ajouter un événement</DialogTitle>
+                    <DialogDescription className="text-slate-400 font-medium text-xs mb-8">Planifiez un moment clé pour la résidence.</DialogDescription>
+                    
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Titre de l&apos;événement</Label>
+                        <Input 
+                          placeholder="Ex: Assemblée de Printemps" 
+                          value={formData.titre}
+                          onChange={e => setFormData({...formData, titre: e.target.value})}
+                          className="h-14 rounded-2xl bg-slate-50 dark:bg-white/5 border-none font-bold"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Date</Label>
+                          <Input 
+                            type="date"
+                            value={formData.date}
+                            onChange={e => setFormData({...formData, date: e.target.value})}
+                            className="h-14 rounded-2xl bg-slate-50 dark:bg-white/10 border-none font-bold text-slate-900 dark:text-white"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Heure</Label>
+                          <Input 
+                            type="time"
+                            value={formData.heure}
+                            onChange={e => setFormData({...formData, heure: e.target.value})}
+                            className="h-14 rounded-2xl bg-slate-50 dark:bg-white/10 border-none font-bold text-slate-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Catégorie</Label>
+                        <div className="relative">
+                          <select 
+                            value={formData.categorie}
+                            onChange={e => setFormData({...formData, categorie: e.target.value})}
+                            className="w-full h-14 rounded-2xl bg-slate-50 dark:bg-white/10 border-none px-4 font-bold text-sm focus:ring-2 focus:ring-indigo-600 outline-none appearance-none text-slate-900 dark:text-white"
+                          >
+                            {CATEGORIES.filter(c => c.id !== 'all').map(c => (
+                              <option key={c.id} value={c.id} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+                                {c.label}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Description</Label>
+                        <Textarea 
+                          placeholder="Détails supplémentaires..."
+                          value={formData.description}
+                          onChange={e => setFormData({...formData, description: e.target.value})}
+                          className="rounded-2xl bg-slate-50 dark:bg-white/5 border-none font-medium min-h-[100px]"
+                        />
+                      </div>
+                      <Button 
+                        onClick={handleCreateEvent} 
+                        disabled={isSaving}
+                        className="w-full h-16 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black shadow-xl shadow-indigo-600/20"
+                      >
+                        {isSaving ? <Loader2 className="h-6 w-6 animate-spin" /> : "ENREGISTRER DANS L'AGENDA"}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </HasRole>
           </div>
-        </div>
-      </div>
-
-        <div className="flex items-center gap-4">
-          <Button 
-            onClick={handleExportAgenda}
-            variant="outline" 
-            className="h-14 px-6 border-slate-200 dark:border-white/10 rounded-2xl font-black text-[10px] uppercase tracking-widest hidden sm:flex items-center gap-2"
-          >
-            <FileText className="h-4 w-4" /> EXPORT PDF
-          </Button>
-
-          <div className="flex bg-slate-100 dark:bg-white/5 p-1.5 rounded-2xl border border-slate-200 dark:border-white/5">
-             <Button variant="ghost" size="icon" onClick={() => setCurrentDate(subMonths(currentDate, 1))} className="rounded-xl hover:bg-white dark:hover:bg-white/10">
-                <ChevronLeft className="h-5 w-5" />
-             </Button>
-             <Button variant="ghost" onClick={() => setCurrentDate(new Date())} className="px-4 font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-white dark:hover:bg-white/10">
-                Aujourd&apos;hui
-             </Button>
-             <Button variant="ghost" size="icon" onClick={() => setCurrentDate(addMonths(currentDate, 1))} className="rounded-xl hover:bg-white dark:hover:bg-white/10">
-                <ChevronRight className="h-5 w-5" />
-             </Button>
-          </div>
-
-          <HasRole roles={['administrateur', 'syndic', 'membre_cs']}>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="h-14 px-8 bg-slate-900 dark:bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-sm shadow-xl group">
-                  <Plus className="mr-2 h-5 w-5 group-hover:rotate-90 transition-transform" />
-                  NOUVEL ÉVÉNEMENT
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="rounded-[2.5rem] border-none shadow-2xl p-8 bg-white dark:bg-slate-900 max-w-lg">
-                <DialogTitle className="text-3xl font-black tracking-tighter mb-2">Ajouter un événement</DialogTitle>
-                <DialogDescription className="text-slate-400 font-medium text-xs mb-8">Planifiez un moment clé pour la résidence.</DialogDescription>
-                
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Titre de l&apos;événement</Label>
-                    <Input 
-                      placeholder="Ex: Assemblée de Printemps" 
-                      value={formData.titre}
-                      onChange={e => setFormData({...formData, titre: e.target.value})}
-                      className="h-14 rounded-2xl bg-slate-50 dark:bg-white/5 border-none font-bold"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Date</Label>
-                      <Input 
-                        type="date"
-                        value={formData.date}
-                        onChange={e => setFormData({...formData, date: e.target.value})}
-                        className="h-14 rounded-2xl bg-slate-50 dark:bg-white/10 border-none font-bold text-slate-900 dark:text-white"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Heure</Label>
-                      <Input 
-                        type="time"
-                        value={formData.heure}
-                        onChange={e => setFormData({...formData, heure: e.target.value})}
-                        className="h-14 rounded-2xl bg-slate-50 dark:bg-white/10 border-none font-bold text-slate-900 dark:text-white"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Catégorie</Label>
-                    <div className="relative">
-                      <select 
-                        value={formData.categorie}
-                        onChange={e => setFormData({...formData, categorie: e.target.value})}
-                        className="w-full h-14 rounded-2xl bg-slate-50 dark:bg-white/10 border-none px-4 font-bold text-sm focus:ring-2 focus:ring-indigo-600 outline-none appearance-none text-slate-900 dark:text-white"
-                      >
-                        {CATEGORIES.filter(c => c.id !== 'all').map(c => (
-                          <option key={c.id} value={c.id} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                            {c.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Description</Label>
-                    <Textarea 
-                      placeholder="Détails supplémentaires..."
-                      value={formData.description}
-                      onChange={e => setFormData({...formData, description: e.target.value})}
-                      className="rounded-2xl bg-slate-50 dark:bg-white/5 border-none font-medium min-h-[100px]"
-                    />
-                  </div>
-                  <Button 
-                    onClick={handleCreateEvent} 
-                    disabled={isSaving}
-                    className="w-full h-16 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black shadow-xl shadow-indigo-600/20"
-                  >
-                    {isSaving ? <Loader2 className="h-6 w-6 animate-spin" /> : "ENREGISTRER DANS L'AGENDA"}
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </HasRole>
         </div>
       </div>
 

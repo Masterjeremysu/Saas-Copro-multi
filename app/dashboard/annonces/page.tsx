@@ -4,13 +4,10 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Megaphone, ArrowLeft, Loader2, 
-  Calendar, User, CheckCircle2,
+  Megaphone, Loader2, CheckCircle2,
   AlertTriangle, Info, Bell,
   Search, Heart, MessageSquare,
-  Share2, Filter, MoreHorizontal,
-  ChevronRight,
-  TrendingUp,
+  Share2, MoreHorizontal,
   Clock
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -18,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import Link from 'next/link';
 import Image from 'next/image';
 
 interface Annonce {

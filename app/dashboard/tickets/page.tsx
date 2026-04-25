@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
 interface Profile {
   id: string;
@@ -338,11 +339,13 @@ function TicketsKanbanContent() {
           </div>
         </div>
       </div>
-        
+
+      <div className="flex justify-center md:justify-end px-2 lg:px-0">
         <Dialog open={isDialogOpen} onOpenChange={resetWizard}>
           <DialogTrigger asChild>
-            <Button className="hidden md:flex bg-indigo-600 hover:bg-indigo-700 rounded-2xl h-12 px-6 font-black shadow-xl shadow-indigo-600/20">
-              <Plus className="mr-2 h-5 w-5" /> Déclarer un incident
+            <Button className="bg-indigo-600 hover:bg-indigo-700 rounded-2xl h-14 px-10 font-black shadow-xl shadow-indigo-600/20 text-white group">
+              <Plus className="mr-2 h-6 w-6 group-hover:rotate-90 transition-transform duration-500" /> 
+              DÉCLARER UN INCIDENT
             </Button>
           </DialogTrigger>
           
