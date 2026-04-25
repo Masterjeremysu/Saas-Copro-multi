@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -18,11 +18,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FilePlus, Loader2 } from "lucide-react";
 
+interface WikiCategory {
+  id: string;
+  titre: string;
+}
+
 export function CreateArticleForm({ onArticleCreated }: { onArticleCreated: () => void }) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [categories, setCategories] = useState<any[]>([]);
-  const supabase = createClient();
+  const [categories, setCategories] = useState<WikiCategory[]>([]);
+  const supabase = useMemo(() => createClient(), []);
 
   // Charger les catégories pour le menu déroulant
   useEffect(() => {
@@ -31,7 +36,7 @@ export function CreateArticleForm({ onArticleCreated }: { onArticleCreated: () =
       if (data) setCategories(data);
     }
     if (open) fetchCategories();
-  }, [open]);
+  }, [open, supabase]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -64,7 +69,7 @@ export function CreateArticleForm({ onArticleCreated }: { onArticleCreated: () =
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Ajouter au livret d'accueil</DialogTitle>
+          <DialogTitle>Ajouter au livret d&apos;accueil</DialogTitle>
           <DialogDescription>
             Partagez une information utile avec tous les résidents.
           </DialogDescription>
@@ -85,7 +90,7 @@ export function CreateArticleForm({ onArticleCreated }: { onArticleCreated: () =
           </div>
           
           <div className="space-y-1">
-            <Label>Titre de l'article</Label>
+            <Label>Titre de l&apos;article</Label>
             <Input name="titre" placeholder="Ex: Code du portillon piéton" required />
           </div>
 
@@ -100,7 +105,7 @@ export function CreateArticleForm({ onArticleCreated }: { onArticleCreated: () =
           </div>
 
           <Button type="submit" className="w-full bg-indigo-600" disabled={isLoading}>
-            {isLoading ? <Loader2 className="animate-spin h-4 w-4" /> : "Publier l'article"}
+            {isLoading ? <Loader2 className="animate-spin h-4 w-4" /> : "Publier l&apos;article"}
           </Button>
         </form>
       </DialogContent>

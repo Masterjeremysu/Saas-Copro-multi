@@ -7,7 +7,7 @@ interface LogActionProps {
   resourceType: string;
   resourceId?: string;
   details: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   severity?: AuditSeverity;
 }
 

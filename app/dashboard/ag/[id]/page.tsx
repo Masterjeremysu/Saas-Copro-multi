@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useParams, useRouter } from 'next/navigation';
 import { 
-  ArrowLeft, CalendarDays, MapPin, Users, 
-  FileText, Plus, Loader2, CheckCircle2, 
-  Scale, AlertCircle, Trash2, GripVertical
+  ArrowLeft, CalendarDays, MapPin,
+  FileText, Loader2,
+  Scale, Trash2, GripVertical
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,15 +15,32 @@ import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { AddResolutionModal } from './add-resolution-modal';
 
+interface Assemblee {
+  id: string;
+  titre: string;
+  statut: string;
+  date_tenue: string;
+  lieu?: string | null;
+}
+
+interface Resolution {
+  id: string;
+  numero_ordre: number;
+  titre: string;
+  description?: string | null;
+  type_majorite: string;
+  montant_alloue?: number | null;
+}
+
 export default function AssembleeDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const [ag, setAg] = useState<any>(null);
-  const [resolutions, setResolutions] = useState<any[]>([]);
+  const [ag, setAg] = useState<Assemblee | null>(null);
+  const [resolutions, setResolutions] = useState<Resolution[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
-  const fetchAGDetails = async () => {
+  const fetchAGDetails = useCallback(async () => {
     setLoading(true);
     
     // 1. Charger l'AG
@@ -49,9 +66,9 @@ export default function AssembleeDetailPage() {
 
     setResolutions(resData || []);
     setLoading(false);
-  };
+  }, [params.id, router, supabase]);
 
-  useEffect(() => { fetchAGDetails(); }, [params.id]);
+  useEffect(() => { fetchAGDetails(); }, [fetchAGDetails]);
 
   const handleDeleteResolution = async (id: string, titre: string) => {
     if (!window.confirm(`Supprimer la résolution : "${titre}" ?`)) return;
@@ -62,8 +79,9 @@ export default function AssembleeDetailPage() {
       if (error) throw error;
       toast.success("Résolution retirée de l'ordre du jour", { id: tid });
       fetchAGDetails();
-    } catch (err: any) {
-      toast.error(err.message, { id: tid });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erreur inconnue';
+      toast.error(message, { id: tid });
     }
   };
 
@@ -143,7 +161,7 @@ export default function AssembleeDetailPage() {
           {resolutions.length === 0 ? (
             <div className="p-16 text-center">
               <Scale className="h-12 w-12 text-slate-200 mx-auto mb-4" />
-              <p className="text-lg font-bold text-slate-900">L'ordre du jour est vide</p>
+              <p className="text-lg font-bold text-slate-900">L&apos;ordre du jour est vide</p>
               <p className="text-sm text-slate-500 mt-1">Ajoutez la première résolution pour commencer.</p>
             </div>
           ) : (
