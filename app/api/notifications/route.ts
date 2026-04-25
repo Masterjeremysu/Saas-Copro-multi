@@ -1,88 +1,163 @@
-import { NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-// Configuration Supabase Serveur
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const adminSupabase = serviceRoleKey ? createClient(supabaseUrl, serviceRoleKey) : null;
 
-// Initialisation de Resend (si la clé est présente)
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 5;
+const requestBuckets = new Map<string, { count: number; windowStart: number }>();
 
-export async function POST(request: Request) {
+function consumeRateLimit(key: string): boolean {
+  const now = Date.now();
+  const bucket = requestBuckets.get(key);
+
+  if (!bucket || now - bucket.windowStart >= RATE_LIMIT_WINDOW_MS) {
+    requestBuckets.set(key, { count: 1, windowStart: now });
+    return true;
+  }
+
+  if (bucket.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return false;
+  }
+
+  bucket.count += 1;
+  requestBuckets.set(key, bucket);
+  return true;
+}
+
+export async function POST(request: NextRequest) {
   try {
-    const { copropriete_id, categorie, titre, urgence } = await request.json();
-
-    if (!copropriete_id || !categorie) {
-      return NextResponse.json({ error: "Paramètres manquants" }, { status: 400 });
+    if (!adminSupabase) {
+      return NextResponse.json(
+        { error: 'Server misconfigured: SUPABASE_SERVICE_ROLE_KEY is missing' },
+        { status: 500 }
+      );
     }
 
-    // 1. Trouver les artisans concernés par cette catégorie dans cette copro
-    const { data: artisans, error } = await supabase
+    let supabaseResponse = NextResponse.next({ request });
+    const authSupabase = createServerClient(supabaseUrl, anonKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          supabaseResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) => {
+            supabaseResponse.cookies.set(name, value, options);
+          });
+        },
+      },
+    });
+
+    const {
+      data: { user },
+      error: userError,
+    } = await authSupabase.auth.getUser();
+
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { copropriete_id, categorie, titre, urgence } = await request.json();
+    if (!copropriete_id || !categorie || !titre || !urgence) {
+      return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
+    }
+
+    const { data: callerProfile, error: profileError } = await adminSupabase
+      .from('profiles')
+      .select('copropriete_id')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !callerProfile) {
+      return NextResponse.json({ error: 'Caller profile not found' }, { status: 403 });
+    }
+
+    if (callerProfile.copropriete_id !== copropriete_id) {
+      return NextResponse.json({ error: 'Forbidden for this copropriete' }, { status: 403 });
+    }
+
+    const limiterKey = `${user.id}:${copropriete_id}`;
+    const allowed = consumeRateLimit(limiterKey);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please retry in a minute.' },
+        { status: 429 }
+      );
+    }
+
+    const { data: artisans, error: artisansError } = await adminSupabase
       .from('profiles')
       .select('email, prenom, nom')
       .eq('copropriete_id', copropriete_id)
       .eq('role', 'artisan')
       .eq('specialite', categorie);
 
-    if (error) throw error;
-
-    if (!artisans || artisans.length === 0) {
-      return NextResponse.json({ message: "Aucun artisan trouvé pour cette spécialité." }, { status: 200 });
+    if (artisansError) {
+      throw artisansError;
     }
 
-    // 2. Envoi / Simulation
+    if (!artisans || artisans.length === 0) {
+      return NextResponse.json(
+        { message: 'No artisan found for this category.' },
+        { status: 200 }
+      );
+    }
+
     for (const artisan of artisans) {
-      
       const emailHtml = `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden;">
           <div style="background-color: #0f172a; padding: 24px; color: white; text-align: center;">
-            <h1 style="margin: 0; font-size: 20px;">🚨 CoproSync : Nouvelle Intervention</h1>
+            <h1 style="margin: 0; font-size: 20px;">CoproSync: New Intervention</h1>
           </div>
           <div style="padding: 32px; color: #1e293b;">
-            <p>Bonjour <strong>${artisan.prenom}</strong>,</p>
-            <p>Une nouvelle demande nécessite votre expertise :</p>
+            <p>Hello <strong>${artisan.prenom}</strong>,</p>
+            <p>A new request needs your expertise:</p>
             <div style="background-color: #f8fafc; padding: 16px; border-radius: 12px; margin: 24px 0;">
-              <p style="margin: 4px 0;"><strong>📍 Catégorie :</strong> ${categorie.toUpperCase()}</p>
-              <p style="margin: 4px 0;"><strong>⚠️ Urgence :</strong> ${urgence.toUpperCase()}</p>
-              <p style="margin: 4px 0;"><strong>📄 Sujet :</strong> ${titre}</p>
+              <p style="margin: 4px 0;"><strong>Category:</strong> ${String(categorie).toUpperCase()}</p>
+              <p style="margin: 4px 0;"><strong>Urgency:</strong> ${String(urgence).toUpperCase()}</p>
+              <p style="margin: 4px 0;"><strong>Subject:</strong> ${titre}</p>
             </div>
-            <p>Veuillez vous connecter sur votre espace mobile pour planifier la date de passage.</p>
+            <p>Please log in to your mobile workspace to schedule the intervention.</p>
             <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/tickets" 
                style="display: block; background-color: #4f46e5; color: white; padding: 16px; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; margin-top: 32px;">
-              Voir le ticket sur mon mobile
+              View ticket on mobile
             </a>
           </div>
         </div>
       `;
 
       if (resend) {
-        // ENVOI RÉEL VIA RESEND
         await resend.emails.send({
           from: 'CoproSync <onboarding@resend.dev>',
           to: artisan.email,
-          subject: `🚨 ${urgence.toUpperCase()} : ${titre}`,
+          subject: `${String(urgence).toUpperCase()}: ${titre}`,
           html: emailHtml,
         });
-        console.log(`✅ Email RÉEL envoyé via Resend à : ${artisan.email}`);
       } else {
-        // SIMULATION DANS LA CONSOLE
-        console.log('\n====================================================');
-        console.log(`ℹ️ [SIMULATION] Envoi d'email à : ${artisan.email}`);
-        console.log(`📝 SUJET : ${titre}`);
-        console.log('====================================================\n');
+        console.log(`[SIMULATION] Notification email to: ${artisan.email} | Subject: ${titre}`);
       }
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: resend ? "Notifications envoyées par email." : "Simulation d'email réussie (Ajoutez RESEND_API_KEY pour l'envoi réel)." 
-    }, { status: 200 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        message: resend
+          ? 'Notification emails sent.'
+          : 'Email simulation completed (set RESEND_API_KEY for real sending).',
+      },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error("Erreur API Notifications:", error);
-    const message = error instanceof Error ? error.message : "Une erreur inconnue est survenue";
+    console.error('Notifications API error:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

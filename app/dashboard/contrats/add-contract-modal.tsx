@@ -91,8 +91,9 @@ export function AddContractModal({ onRefresh }: { onRefresh: () => void }) {
       setFile(null);
       onRefresh();
 
-    } catch (err: any) {
-      toast.error(err.message, { id: tid });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erreur inconnue';
+      toast.error(message, { id: tid });
     } finally {
       setLoading(false);
     }

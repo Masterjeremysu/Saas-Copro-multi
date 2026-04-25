@@ -65,7 +65,7 @@ export function CreateProForm({ onProCreated }: { onProCreated: () => void }) {
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4 pt-4">
           <div className="space-y-1">
-            <Label>Nom de l'entreprise</Label>
+            <Label>Nom de l&apos;entreprise</Label>
             <Input name="nom" placeholder="Ex: Otis, Veolia, etc." required className="rounded-xl h-11" />
           </div>
 

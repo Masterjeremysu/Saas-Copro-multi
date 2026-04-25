@@ -1,29 +1,41 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send, User, Loader2 } from 'lucide-react';
 
+interface TicketComment {
+  id: string;
+  contenu: string;
+  created_at: string;
+  auteur?: { nom?: string | null; prenom?: string | null } | null;
+}
+
 export function TicketComments({ ticketId }: { ticketId: string }) {
-  const [comments, setComments] = useState<any[]>([]);
+  const [comments, setComments] = useState<TicketComment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // Charger les commentaires
-  async function fetchComments() {
+  const fetchComments = useCallback(async () => {
     const { data } = await supabase
       .from('commentaires')
       .select('*, auteur:profiles(nom, prenom)')
       .eq('ticket_id', ticketId)
       .order('created_at', { ascending: true });
     if (data) setComments(data);
-  }
+  }, [supabase, ticketId]);
 
-  useEffect(() => { fetchComments(); }, [ticketId]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchComments();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchComments]);
 
   // Envoyer un commentaire
   async function handleSubmit(e: React.FormEvent) {

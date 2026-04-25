@@ -2,8 +2,8 @@
 
 import { 
   Vote, Calendar, BarChart3, Users, 
-  Clock, ArrowRight, CheckCircle2,
-  AlertCircle, ChevronRight, Zap
+  Clock, CheckCircle2,
+  AlertCircle, ChevronRight
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,8 @@ interface DecisionCardProps {
 
 export function DecisionCard({ consultation, onVote }: DecisionCardProps) {
   const isClosed = consultation.status === 'closed';
-  const isUrgent = !isClosed && new Date(consultation.closing_date).getTime() - Date.now() < 86400000; // < 24h
+  const isUrgent =
+    !isClosed && new Date(consultation.closing_date).getTime() - new Date().getTime() < 86400000; // < 24h
 
   const typeConfig = {
     official: { icon: <Vote className="h-4 w-4" />, color: 'indigo', label: 'Vote Officiel' },
