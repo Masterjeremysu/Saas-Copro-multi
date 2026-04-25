@@ -23,7 +23,6 @@ import {
   Zap,
   Wrench,
   ShieldCheck,
-  ChevronRight,
   Building2,
   FileCheck2
 } from 'lucide-react';
@@ -333,7 +332,7 @@ export default function CarnetPage() {
                               <Input name="date_intervention" type="date" required className="h-12 rounded-xl bg-slate-50 dark:bg-white/5 border-none font-bold focus:ring-4 focus:ring-indigo-50" />
                             </div>
                             <div className="space-y-2">
-                              <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Type d'Action</Label>
+                              <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Type d&apos;Action</Label>
                               <select name="type_intervention" required className="flex h-12 w-full rounded-xl bg-slate-50 dark:bg-white/5 px-3 py-2 text-sm border-none font-bold focus:ring-4 focus:ring-indigo-50 outline-none">
                                 <option value="Maintenance">Maintenance</option>
                                 <option value="Réparation">Réparation</option>
