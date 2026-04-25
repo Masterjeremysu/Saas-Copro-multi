@@ -99,6 +99,10 @@ export default function AssembleeDetailPage() {
     return <div className="h-screen flex items-center justify-center"><Loader2 className="animate-spin h-8 w-8 text-indigo-600" /></div>;
   }
 
+  if (!ag) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-[#F9FAFB] p-6 md:p-10 space-y-8 font-sans">
       
